@@ -73,3 +73,37 @@ repos:
         files: ^market_data_backend_platform/
         stages: [pre-push]
         pass_filenames: false
+
+  # --- ESLINT (frontend JS only, pre-commit) ---
+  - repo: local
+    hooks:
+      - id: eslint
+        name: ESLint (frontend)
+        entry: bash -c "if [ -f market_data_frontend_platform/package.json ]; then cd market_data_frontend_platform && npm run lint; fi"
+        language: system
+        files: ^market_data_frontend_platform/src/
+        types_or: [javascript, jsx]
+        stages: [pre-commit]
+        pass_filenames: false
+
+  # --- PRETTIER (frontend JS only, pre-commit) ---
+  - repo: local
+    hooks:
+      - id: prettier
+        name: Prettier check (frontend)
+        entry: bash -c "if [ -f market_data_frontend_platform/package.json ]; then cd market_data_frontend_platform && npm run format:check; fi"
+        language: system
+        files: ^market_data_frontend_platform/src/
+        stages: [pre-commit]
+        pass_filenames: false
+
+  # --- VITEST (frontend only, pre-push) ---
+  - repo: local
+    hooks:
+      - id: vitest-full
+        name: Vitest full suite (frontend)
+        entry: bash -c "if [ -f market_data_frontend_platform/package.json ]; then cd market_data_frontend_platform && npm test; fi"
+        language: system
+        files: ^market_data_frontend_platform/
+        stages: [pre-push]
+        pass_filenames: false
