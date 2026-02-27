@@ -1,5 +1,5 @@
 repos:
-  # --- ISORT  ---
+  # --- ISORT (backend Python only) ---
   - repo: https://github.com/pycqa/isort
     rev: 7.0.0
     hooks:
@@ -7,28 +7,29 @@ repos:
         name: isort (sort imports)
         language_version: python3.14
         args: ["--profile=black"]
-        additional_dependencies: []
+        files: ^market_data_backend_platform/src/
         stages: [pre-commit]
 
-  # --- BLACK ---
+  # --- BLACK (backend Python only) ---
   - repo: https://github.com/psf/black
     rev: 25.11.0
     hooks:
       - id: black
         language_version: python3.14
-        additional_dependencies: []
+        files: ^market_data_backend_platform/src/
         stages: [pre-commit]
 
-  # --- PYLINT ---
+  # --- PYLINT (backend Python only) ---
   - repo: local
     hooks:
       - id: pylint
         name: pylint (local)
-        entry: .venv/Scripts/pylint.exe
+        entry: market_data_backend_platform/.venv/Scripts/pylint.exe
         language: python
         types: [python]
+        files: ^market_data_backend_platform/src/
         args:
-          - "--rcfile=.pylintrc"
+          - "--rcfile=market_data_backend_platform/.pylintrc"
         additional_dependencies:
           - pylint==4.0.3
           - pydantic==2.12.4
@@ -36,21 +37,22 @@ repos:
           - typing_extensions==4.15.0
         stages: [pre-commit]
 
-  # --- MYPY ---
+  # --- MYPY (backend Python only) ---
   - repo: https://github.com/pre-commit/mirrors-mypy
     rev: v1.10.0
     hooks:
       - id: mypy
-        exclude: ^(tests/|alembic/)
+        files: ^market_data_backend_platform/src/
+        exclude: ^(market_data_backend_platform/tests/|market_data_backend_platform/alembic/)
         additional_dependencies:
           - pydantic
           - pydantic-settings
           - types-requests
           - sqlalchemy
-        args: ["--config-file=pyproject.toml"]
+        args: ["--config-file=market_data_backend_platform/pyproject.toml"]
         stages: [pre-commit]
 
-  # --- PRE-COMMIT HOOKS  ---
+  # --- PRE-COMMIT HOOKS (monorepo-wide) ---
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
@@ -60,15 +62,14 @@ repos:
       - id: check-added-large-files
       - id: check-merge-conflict
 
-  # --- PYTEST pre-push --
+  # --- PYTEST (backend only, pre-push) ---
   - repo: local
     hooks:
       - id: pytest-full
-        name: pytest full suite
-        entry: .venv/Scripts/pytest.exe
-        language: python
+        name: pytest full suite (backend)
+        entry: bash -c "cd market_data_backend_platform && .venv/Scripts/pytest.exe -q"
+        language: system
         types: [python]
+        files: ^market_data_backend_platform/
         stages: [pre-push]
         pass_filenames: false
-        args: ["-q"]
-        additional_dependencies: []
