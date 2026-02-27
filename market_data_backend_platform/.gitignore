@@ -1,0 +1,53 @@
+# --- PyInstaller ---
+dist/
+build/
+*.spec
+
+# --- Python ---
+__pycache__/
+cache/
+*.py[cod]
+*.pyc
+*.pyo
+*.pyd
+.mypy_cache/
+
+# Pytest cache
+.pytest_cache/
+
+# Coverage reports
+.coverage
+htmlcov/
+
+# VS Code configuration
+.vscode/
+
+# Operating system temporary files
+*.log
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Docker-generated files
+*.pid
+
+# Environment variables
+*.env
+.env.*
+!.env.example
+*.key
+secrets/
+
+# Python packages
+*.egg-info/
+.venv/
+
+# Pre-commit cache
+.pre-commit-cache/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Custom directories and files
+*.SQL
+.agent/

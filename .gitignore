@@ -1,0 +1,45 @@
+# =============================================================================
+# .gitignore — Monorepo root (market_data_platform)
+# Covers: Python backend + JavaScript frontend + shared tooling
+# =============================================================================
+
+# ── Python (backend) ─────────────────────────────────────────────────────────
+market_data_backend_platform/.venv
+market_data_backend_platform/__pycache__/
+market_data_backend_platform/**/__pycache__/
+market_data_backend_platform/*.egg-info
+market_data_backend_platform/src/*.egg-info
+market_data_backend_platform/.pytest_cache
+market_data_backend_platform/.mypy_cache
+market_data_backend_platform/.ruff_cache
+market_data_backend_platform/htmlcov/
+market_data_backend_platform/.coverage
+.pytest_cache/
+
+# ── JavaScript (frontend) ────────────────────────────────────────────────────
+market_data_frontend_platform/node_modules/
+market_data_frontend_platform/dist/
+market_data_frontend_platform/.vite/
+market_data_frontend_platform/coverage/
+
+# ── Environment files ────────────────────────────────────────────────────────
+.env
+market_data_backend_platform/.env
+market_data_frontend_platform/.env
+
+# ── OS ───────────────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── IDE ──────────────────────────────────────────────────────────────────────
+.vscode/
+.claude/
+.idea/
+*.swp
+*.swo
+*~
+
+# ── Docker ───────────────────────────────────────────────────────────────────
+# (volumes and override files are local only)
+docker-compose.override.yml

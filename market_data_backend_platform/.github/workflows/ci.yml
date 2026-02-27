@@ -1,0 +1,98 @@
+# CI Pipeline — Market Data Backend Platform
+# Runs code quality checks and unit tests on every push/PR.
+# Integration tests (requiring Docker/PostgreSQL) are excluded from CI.
+
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - "feature/**"
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # ---------------------------------------------------------------------------
+  # Job 1: Code Quality (black, isort, pylint, mypy)
+  # ---------------------------------------------------------------------------
+  quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Check formatting (black)
+        run: black --check src/ tests/
+
+      - name: Check import order (isort)
+        run: isort --check-only --profile=black src/ tests/
+
+      - name: Lint (pylint)
+        run: pylint src/ --rcfile=.pylintrc
+
+      - name: Type check (mypy)
+        run: mypy src/ --config-file=pyproject.toml
+
+  # ---------------------------------------------------------------------------
+  # Job 2: Unit Tests (no Docker required)
+  # ---------------------------------------------------------------------------
+  tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    needs: quality
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.14
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Cache pip dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run unit tests with coverage
+        env:
+          SECRET_KEY: "ci-test-secret-key-for-github-actions-only"
+          ADMIN_EMAIL: "admin@test.com"
+          ADMIN_PASSWORD_HASH: "$2b$12$B9NxCdpM3Tz3YnxkXTqaw.trJaR.lz0bz9uzK5X56Au2FVuV23aLG"
+          DB_HOST: "localhost"
+          DB_PORT: "5432"
+          DB_USER: "market_data"
+          DB_PASSWORD: "market_data_pass"
+          DB_NAME: "market_data"
+        run: |
+          pytest tests/unit/ -q \
+            --cov=src/market_data_backend_platform \
+            --cov-report=term-missing \
+            --cov-fail-under=85

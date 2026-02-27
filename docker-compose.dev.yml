@@ -1,0 +1,29 @@
+# docker-compose.dev.yml
+# Purpose: Hot reload and dev tooling — overrides production config
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  api:
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn market_data_backend_platform.main:app --reload --host 0.0.0.0 --port 8000"
+    environment:
+      DEBUG: "true"
+      LOG_LEVEL: DEBUG
+      LOG_FORMAT: console
+    volumes:
+      - ./market_data_backend_platform/src:/app/src          # Hot reload backend
+      - ./market_data_backend_platform/alembic:/app/alembic
+      - ./market_data_backend_platform/alembic.ini:/app/alembic.ini
+
+  frontend:
+    build:
+      context: ./market_data_frontend_platform
+      dockerfile: Dockerfile
+      target: development    # Multi-stage Dockerfile target
+    command: npm run dev -- --host
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./market_data_frontend_platform/src:/app/src          # Hot reload frontend
+      - /app/node_modules                                      # Preserve node_modules in container
