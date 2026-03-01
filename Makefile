@@ -9,7 +9,9 @@
 
 # ── Full Stack ────────────────────────────────────────────────────────────────
 up:           ## Start all services (production-like)
-	docker-compose up -d
+	docker-compose up -d --build
+	docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+	@echo Services started.
 
 up-dev:       ## Start all services with hot reload
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
