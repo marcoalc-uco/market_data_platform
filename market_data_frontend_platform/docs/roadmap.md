@@ -8,7 +8,7 @@
 ## Status Legend
 
 | Symbol | Status      |
-|--------|-------------|
+| ------ | ----------- |
 | ✅     | Complete    |
 | 🔄     | In progress |
 | ⬜     | Pending     |
@@ -18,15 +18,15 @@
 
 ## v1 — Core Dashboard
 
-| Phase | Milestone                                 | Status | Commit scope                  |
-|-------|-------------------------------------------|--------|-------------------------------|
-| 0     | Docs scaffold (PRD, DEV_PLAN, QA, arch)   | ✅     | `docs(frontend):`             |
-| 1     | Vite project init + toolchain             | ⬜     | `feat(frontend):`             |
-| 2     | API client layer (`src/api/`)             | ⬜     | `feat(frontend):`             |
-| 3     | Authentication (JWT, protected routes)    | ⬜     | `feat(frontend):`             |
-| 4     | Instruments list (table, filters, CRUD)   | ⬜     | `feat(frontend):`             |
-| 5     | Price chart (OHLCV candlestick)           | ⬜     | `feat(frontend):`             |
-| 6     | Integration & QA (lint, coverage, build)  | ⬜     | `chore(frontend):`            |
+| Phase | Milestone                                | Status | Commit scope       |
+| ----- | ---------------------------------------- | ------ | ------------------ |
+| 0     | Docs scaffold (PRD, DEV_PLAN, QA, arch)  | ✅     | `docs(frontend):`  |
+| 1     | Vite project init + toolchain            | ✅     | `feat(frontend):`  |
+| 2     | API client layer (`src/api/`)            | ✅     | `feat(frontend):`  |
+| 3     | Authentication (JWT, protected routes)   | 🔄     | `feat(frontend):`  |
+| 4     | Instruments list (table, filters, CRUD)  | ⬜     | `feat(frontend):`  |
+| 5     | Price chart (OHLCV candlestick)          | ⬜     | `feat(frontend):`  |
+| 6     | Integration & QA (lint, coverage, build) | ⬜     | `chore(frontend):` |
 
 ---
 
@@ -40,24 +40,25 @@
 - [x] `docs/architecture.md` — component hierarchy + data flow
 - [x] `docs/roadmap.md` — this file
 
-### Phase 1 — Vite project setup ⬜
+### Phase 1 — Vite project setup ✅
 
-- [ ] `npm create vite@latest` with `--template react`
-- [ ] Install runtime dependencies (TanStack Query, lightweight-charts, react-router-dom)
-- [ ] Install dev dependencies (Vitest, RTL, ESLint, Prettier)
-- [ ] Configure `vite.config.js` (Vitest + coverage threshold 80%)
-- [ ] Configure `.eslintrc.js` and `.prettierrc`
-- [ ] Add npm scripts (dev, build, lint, format:check, test)
-- [ ] Create `nginx.conf` + `Dockerfile`
-- [ ] Create `.env.example`
+- [x] Vite + React scaffold (manual, equivalent to `npm create vite`)
+- [x] Install runtime dependencies (TanStack Query v5, lightweight-charts, react-router-dom v6)
+- [x] Install dev dependencies (Vitest 2, RTL, ESLint 8, Prettier)
+- [x] Configure `vite.config.js` (Vitest + `passWithNoTests`; thresholds activate Phase 2)
+- [x] Configure `.eslintrc.cjs` (CommonJS required for ESLint 8 + `"type":"module"`) + `.prettierrc`
+- [x] Add npm scripts (dev, build, lint, format:check, test, test:watch)
+- [x] Create `nginx.conf` (SPA fallback + gzip) + `Dockerfile` (multi-stage)
+- [x] Create `.env.example` (`VITE_API_URL=http://localhost:8000`)
+- [x] Create `.node-version = 20` (fnm auto-switch)
 
-### Phase 2 — API client layer ⬜
+### Phase 2 — API client layer ✅
 
-- [ ] `src/api/client.js` — base fetch with auth header + error handling
-- [ ] `src/api/auth.js` — login endpoint
-- [ ] `src/api/instruments.js` — CRUD endpoints
-- [ ] `src/api/prices.js` — OHLCV + latest price endpoints
-- [ ] Unit tests for all `src/api/` modules (100% coverage target)
+- [x] `src/api/client.js` — base fetch with auth header + error handling
+- [x] `src/api/auth.js` — login endpoint
+- [x] `src/api/instruments.js` — CRUD endpoints
+- [x] `src/api/prices.js` — OHLCV + latest price endpoints
+- [x] Unit tests for all `src/api/` modules (100% coverage target)
 
 ### Phase 3 — Authentication ⬜
 
@@ -99,7 +100,7 @@
 ## v2 — Post-v1 (Out of Scope for Now)
 
 | Feature                          | Priority |
-|----------------------------------|----------|
+| -------------------------------- | -------- |
 | Real-time WebSocket price stream | High     |
 | Dark mode                        | Medium   |
 | Mobile-responsive layout         | Medium   |
