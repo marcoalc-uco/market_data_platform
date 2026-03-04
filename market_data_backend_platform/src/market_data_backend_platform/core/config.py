@@ -113,6 +113,16 @@ class Settings(BaseSettings):
         description="Bcrypt hash of admin password (set via ADMIN_PASSWORD_HASH env var)",
     )
 
+    # CORS
+    cors_origins: list[str] = Field(
+        default=["http://localhost:5173"],
+        description=(
+            "Allowed CORS origins. Set to the frontend URL(s) in production, "
+            "e.g. https://app.example.com. "
+            "Never use ['*'] together with allow_credentials=True."
+        ),
+    )
+
     # Scheduler
     ingestion_interval_minutes: int = Field(
         default=5,

@@ -13,7 +13,7 @@ export const createInstrument = (data) =>
 
 export const updateInstrument = (id, data) =>
   apiClient.request(`/api/v1/instruments/${id}`, {
-    method: 'PUT',
+    method: 'PATCH',
     body: JSON.stringify(data),
   })
 

@@ -60,12 +60,12 @@ describe('instruments API', () => {
   })
 
   describe('updateInstrument', () => {
-    it('calls PUT /api/v1/instruments/:id with body', async () => {
+    it('calls PATCH /api/v1/instruments/:id with body', async () => {
       const data = { name: 'Apple Inc. Updated' }
       await updateInstrument(1, data)
       expect(clientModule.apiClient.request).toHaveBeenCalledWith(
         '/api/v1/instruments/1',
-        expect.objectContaining({ method: 'PUT', body: JSON.stringify(data) })
+        expect.objectContaining({ method: 'PATCH', body: JSON.stringify(data) })
       )
     })
   })

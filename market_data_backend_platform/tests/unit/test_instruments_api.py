@@ -118,7 +118,7 @@ class TestCreateInstrument:
         payload = {
             "symbol": "GOOGL",
             "name": "Alphabet Inc.",
-            "instrument_type": "stock",
+            "asset_type": "stock",
             "exchange": "NASDAQ",
         }
 
@@ -128,7 +128,7 @@ class TestCreateInstrument:
         data = response.json()
         assert data["symbol"] == "GOOGL"
         assert data["name"] == "Alphabet Inc."
-        assert data["instrument_type"] == "stock"
+        assert data["asset_type"] == "stock"
         assert data["is_active"] is True
         assert "id" in data
 
@@ -152,7 +152,7 @@ class TestCreateInstrument:
         payload = {
             "symbol": "AAPL",
             "name": "Apple (duplicate)",
-            "instrument_type": "stock",
+            "asset_type": "stock",
             "exchange": "NYSE",
         }
         response = client.post("/api/v1/instruments", json=payload)

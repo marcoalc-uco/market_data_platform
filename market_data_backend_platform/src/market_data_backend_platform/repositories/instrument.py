@@ -42,6 +42,31 @@ class InstrumentRepository(BaseRepository[Instrument]):
             self.session.query(Instrument).filter(Instrument.symbol == symbol).first()
         )
 
+    def list_filtered(
+        self,
+        instrument_type: InstrumentType | None = None,
+        is_active: bool | None = None,
+        skip: int = 0,
+        limit: int = 20,
+    ) -> list[Instrument]:
+        """List instruments with optional filters and pagination.
+
+        Args:
+            instrument_type: Filter by instrument type (STOCK, INDEX, CRYPTO).
+            is_active: Filter by active status. None means no filter.
+            skip: Number of records to skip (offset).
+            limit: Maximum number of records to return.
+
+        Returns:
+            Filtered and paginated list of instruments.
+        """
+        query = self.session.query(Instrument)
+        if instrument_type is not None:
+            query = query.filter(Instrument.instrument_type == instrument_type)
+        if is_active is not None:
+            query = query.filter(Instrument.is_active.is_(is_active))
+        return list(query.offset(skip).limit(limit).all())
+
     def get_active(self) -> list[Instrument]:
         """Get all active instruments.
 

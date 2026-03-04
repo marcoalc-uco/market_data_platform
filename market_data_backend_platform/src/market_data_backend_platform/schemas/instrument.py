@@ -17,12 +17,19 @@ from market_data_backend_platform.models.instrument import InstrumentType
 class InstrumentBase(BaseModel):
     """Base schema with common Instrument fields.
 
+    ``instrument_type`` is exposed as ``asset_type`` in the API via a Pydantic
+    alias so the JSON contract matches the frontend and the PRD.
+    ``populate_by_name=True`` allows the Python attribute name to still be used
+    internally (e.g. when constructing ORM objects from ``model_dump()``).
+
     Attributes:
         symbol: Unique ticker symbol (e.g., AAPL, BTC-USD).
         name: Full name of the instrument.
-        instrument_type: Type of instrument (stock, index, crypto).
+        instrument_type: Type of instrument – serialised/received as ``asset_type``.
         exchange: Exchange where the instrument is traded.
     """
+
+    model_config = ConfigDict(populate_by_name=True)
 
     symbol: str = Field(
         ...,
@@ -40,7 +47,8 @@ class InstrumentBase(BaseModel):
     )
     instrument_type: InstrumentType = Field(
         ...,
-        description="Type of financial instrument",
+        alias="asset_type",
+        description="Type of financial instrument (stock | index | crypto)",
     )
     exchange: str = Field(
         ...,
@@ -82,7 +90,7 @@ class InstrumentResponse(InstrumentBase):
         updated_at: Timestamp of last update.
     """
 
-    model_config = ConfigDict(from_attributes=True)
+    model_config = ConfigDict(from_attributes=True, populate_by_name=True)
 
     id: int
     is_active: bool

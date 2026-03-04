@@ -24,8 +24,8 @@
 | 1     | Vite project init + toolchain            | ✅     | `feat(frontend):`  |
 | 2     | API client layer (`src/api/`)            | ✅     | `feat(frontend):`  |
 | 3     | Authentication (JWT, protected routes)   | ✅     | `feat(frontend):`  |
-| 4     | Instruments list (table, filters, CRUD)  | 🔄     | `feat(frontend):`  |
-| 5     | Price chart (OHLCV candlestick)          | ⬜     | `feat(frontend):`  |
+| 4     | Instruments list (table, filters, CRUD)  | ✅     | `feat(frontend):`  |
+| 5     | Price chart (OHLCV candlestick)          | 🔄     | `feat(frontend):`  |
 | 6     | Integration & QA (lint, coverage, build) | ⬜     | `chore(frontend):` |
 
 ---
@@ -68,15 +68,15 @@
 - [x] `src/components/ProtectedRoute/` — token guard + test
 - [x] `src/main.jsx` — router setup (react-router-dom v6)
 
-### Phase 4 — Instruments list ⬜
+### Phase 4 — Instruments list ✅
 
-- [ ] `src/hooks/useInstruments.js` — TanStack Query list
-- [ ] `src/hooks/useInstrumentMutations.js` — create/update/delete
-- [ ] `src/components/InstrumentTable/` — table + test
-- [ ] `src/components/InstrumentFilters/` — filter bar + test
-- [ ] `src/components/InstrumentForm/` — create/edit modal + test
-- [ ] `src/components/Pagination/` — skip/limit controls + test
-- [ ] `src/pages/Instruments/` — page composition
+- [x] `src/hooks/useInstruments.js` — TanStack Query list
+- [x] `src/hooks/useInstrumentMutations.js` — create/update/delete
+- [x] `src/components/InstrumentTable/` — table + test
+- [x] `src/components/InstrumentFilters/` — filter bar + test
+- [x] `src/components/InstrumentForm/` — create/edit modal + test
+- [x] `src/components/Pagination/` — skip/limit controls + test
+- [x] `src/pages/Instruments/` — page composition
 
 ### Phase 5 — Price chart ⬜
 
