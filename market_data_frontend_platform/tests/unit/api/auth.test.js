@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { login } from '../auth.js'
-import * as clientModule from '../client.js'
+import { login } from '../../../src/api/auth.js'
+import * as clientModule from '../../../src/api/client.js'
 
 describe('auth API', () => {
   beforeEach(() => {

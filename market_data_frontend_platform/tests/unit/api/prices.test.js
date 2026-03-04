@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { getPrices, getLatestPrice } from '../prices.js'
-import * as clientModule from '../client.js'
+import { getPrices, getLatestPrice } from '../../../src/api/prices.js'
+import * as clientModule from '../../../src/api/client.js'
 
 const mockPrice = {
   id: 1,

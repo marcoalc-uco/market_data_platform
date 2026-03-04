@@ -52,8 +52,7 @@ market_data_frontend_platform/
 │   ├── components/             ← Reusable, stateless UI components
 │   │   └── <ComponentName>/
 │   │       ├── ComponentName.jsx
-│   │       ├── ComponentName.module.css
-│   │       └── ComponentName.test.jsx
+│   │       └── ComponentName.module.css
 │   │
 │   ├── pages/                  ← Route-level components (compose components)
 │   │   └── <PageName>/
@@ -64,14 +63,23 @@ market_data_frontend_platform/
 │   │   └── use<HookName>.js
 │   │
 │   ├── assets/                 ← Static images, fonts, icons
+│   ├── test/
+│   │   ├── setup.js            ← Vitest global setup (@testing-library/jest-dom)
+│   │   └── testUtils.jsx       ← renderWithProviders (QueryClient + MemoryRouter)
 │   └── main.jsx                ← Entry point (React root, router)
+│
+├── tests/                      ← All tests (mirrors src/ structure, like backend)
+│   └── unit/
+│       ├── api/                ← Tests for src/api/
+│       ├── components/         ← Tests for src/components/
+│       └── hooks/              ← Tests for src/hooks/
 │
 ├── public/                     ← Static files served as-is
 ├── Dockerfile                  ← Multi-stage: builder (Vite) + production (Nginx) + development
 ├── nginx.conf                  ← Nginx config for SPA (all routes → index.html)
 ├── package.json
 ├── vite.config.js
-├── .eslintrc.js
+├── .eslintrc.cjs               ← ESLint config (CommonJS, required for ESLint 8 + type:module)
 ├── .prettierrc
 ├── .env.example                ← VITE_API_URL only
 └── AGENT.md                    ← This file

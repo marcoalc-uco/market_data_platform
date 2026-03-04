@@ -23,8 +23,8 @@
 | 0     | Docs scaffold (PRD, DEV_PLAN, QA, arch)  | ✅     | `docs(frontend):`  |
 | 1     | Vite project init + toolchain            | ✅     | `feat(frontend):`  |
 | 2     | API client layer (`src/api/`)            | ✅     | `feat(frontend):`  |
-| 3     | Authentication (JWT, protected routes)   | 🔄     | `feat(frontend):`  |
-| 4     | Instruments list (table, filters, CRUD)  | ⬜     | `feat(frontend):`  |
+| 3     | Authentication (JWT, protected routes)   | ✅     | `feat(frontend):`  |
+| 4     | Instruments list (table, filters, CRUD)  | 🔄     | `feat(frontend):`  |
 | 5     | Price chart (OHLCV candlestick)          | ⬜     | `feat(frontend):`  |
 | 6     | Integration & QA (lint, coverage, build) | ⬜     | `chore(frontend):` |
 
@@ -60,13 +60,13 @@
 - [x] `src/api/prices.js` — OHLCV + latest price endpoints
 - [x] Unit tests for all `src/api/` modules (100% coverage target)
 
-### Phase 3 — Authentication ⬜
+### Phase 3 — Authentication ✅
 
-- [ ] `src/hooks/useAuth.js` — login mutation, token storage, logout
-- [ ] `src/components/LoginForm/` — form + test
-- [ ] `src/pages/Login/` — login page
-- [ ] `src/components/ProtectedRoute/` — token guard + test
-- [ ] `src/main.jsx` — router setup (react-router-dom v6)
+- [x] `src/hooks/useAuth.js` — login mutation, token storage, logout
+- [x] `src/components/LoginForm/` — form + test
+- [x] `src/pages/Login/` — login page
+- [x] `src/components/ProtectedRoute/` — token guard + test
+- [x] `src/main.jsx` — router setup (react-router-dom v6)
 
 ### Phase 4 — Instruments list ⬜
 

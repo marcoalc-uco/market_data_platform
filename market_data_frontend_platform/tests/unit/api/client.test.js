@@ -3,7 +3,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 // Import after stubbing env
 vi.stubEnv('VITE_API_URL', 'http://testserver')
 
-const { apiClient } = await import('../client.js')
+const { apiClient } = await import('../../../src/api/client.js')
 
 describe('apiClient.request', () => {
   beforeEach(() => {
@@ -76,9 +76,7 @@ describe('apiClient.request', () => {
       json: () => Promise.resolve({ detail: 'Instrument not found' }),
     })
 
-    await expect(apiClient.request('/api/v1/instruments/99')).rejects.toThrow(
-      'Instrument not found'
-    )
+    await expect(apiClient.request('/api/v1/instruments/99')).rejects.toThrow('Instrument not found')
   })
 
   it('throws Error with statusText when no detail in error body', async () => {

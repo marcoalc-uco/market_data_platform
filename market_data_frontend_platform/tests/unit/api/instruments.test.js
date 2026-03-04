@@ -5,8 +5,8 @@ import {
   createInstrument,
   updateInstrument,
   deleteInstrument,
-} from '../instruments.js'
-import * as clientModule from '../client.js'
+} from '../../../src/api/instruments.js'
+import * as clientModule from '../../../src/api/client.js'
 
 const mockInstrument = {
   id: 1,
