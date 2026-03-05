@@ -25,8 +25,8 @@
 | 2     | API client layer (`src/api/`)            | ✅     | `feat(frontend):`  |
 | 3     | Authentication (JWT, protected routes)   | ✅     | `feat(frontend):`  |
 | 4     | Instruments list (table, filters, CRUD)  | ✅     | `feat(frontend):`  |
-| 5     | Price chart (OHLCV candlestick)          | 🔄     | `feat(frontend):`  |
-| 6     | Integration & QA (lint, coverage, build) | ⬜     | `chore(frontend):` |
+| 5     | Price chart (OHLCV candlestick)          | ✅     | `feat(frontend):`  |
+| 6     | Integration & QA (lint, coverage, build) | 🔄     | `chore(frontend):` |
 
 ---
 
@@ -78,14 +78,14 @@
 - [x] `src/components/Pagination/` — skip/limit controls + test
 - [x] `src/pages/Instruments/` — page composition
 
-### Phase 5 — Price chart ⬜
+### Phase 5 — Price chart ✅
 
-- [ ] `src/hooks/usePrices.js` — TanStack Query OHLCV list
-- [ ] `src/hooks/useLatestPrice.js` — TanStack Query latest price
-- [ ] `src/components/PriceChart/` — lightweight-charts wrapper + test
-- [ ] `src/components/DateRangePicker/` — date inputs + test
-- [ ] `src/components/LatestPriceSummary/` — summary card + test
-- [ ] `src/pages/PriceView/` — page composition
+- [x] `src/hooks/usePrices.js` — TanStack Query OHLCV list
+- [x] `src/hooks/useLatestPrice.js` — TanStack Query latest price
+- [x] `src/components/PriceChart/` — lightweight-charts wrapper + test (vi.hoisted mock)
+- [x] `src/components/DateRangePicker/` — date inputs + test
+- [x] `src/components/LatestPriceSummary/` — summary card + test
+- [x] `src/pages/PriceView/` — page composition
 
 ### Phase 6 — Integration & QA ⬜
 

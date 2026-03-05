@@ -1,0 +1,19 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.symbol {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.chart {
+  width: 100%;
+  border: 1px solid #e8eaed;
+  border-radius: 6px;
+  overflow: hidden;
+}
