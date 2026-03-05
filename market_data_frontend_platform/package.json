@@ -9,7 +9,8 @@
     "lint": "eslint src --ext .js,.jsx --max-warnings 0",
     "format:check": "prettier --check src",
     "format": "prettier --write src",
-    "test": "vitest run --coverage",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
     "test:watch": "vitest"
   },
   "dependencies": {
