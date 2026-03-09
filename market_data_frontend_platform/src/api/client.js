@@ -1,4 +1,4 @@
-const getBaseUrl = () => import.meta.env.VITE_API_URL ?? 'http://localhost:8000'
+const getBaseUrl = () => import.meta.env.VITE_API_URL ?? ''
 
 function buildHeaders(extra = {}) {
   const headers = { 'Content-Type': 'application/json', ...extra }
@@ -17,6 +17,12 @@ async function request(path, options = {}) {
   if (response.status === 204) return null
 
   if (!response.ok) {
+    if (response.status === 401) {
+      localStorage.removeItem('token')
+      window.location.href = '/login'
+      // Throw a silent error so the promise chain breaks without showing an alert
+      throw new Error('Session expired')
+    }
     const body = await response.json().catch(() => ({}))
     throw new Error(body.detail ?? response.statusText)
   }

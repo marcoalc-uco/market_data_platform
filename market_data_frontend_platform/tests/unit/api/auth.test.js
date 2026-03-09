@@ -13,21 +13,21 @@ describe('auth API', () => {
     vi.restoreAllMocks()
   })
 
-  it('calls POST /api/v1/auth/login', async () => {
+  it('calls POST /api/v1/auth/token', async () => {
     await login({ username: 'admin', password: 'secret' })
 
     expect(clientModule.apiClient.request).toHaveBeenCalledWith(
-      '/api/v1/auth/login',
+      '/api/v1/auth/token',
       expect.objectContaining({ method: 'POST' })
     )
   })
 
-  it('sends credentials as JSON body', async () => {
-    const credentials = { username: 'admin', password: 'secret' }
-    await login(credentials)
+  it('sends credentials as form-urlencoded body', async () => {
+    await login({ username: 'admin', password: 'secret' })
 
     const [, options] = clientModule.apiClient.request.mock.calls[0]
-    expect(options.body).toBe(JSON.stringify(credentials))
+    expect(options.headers['Content-Type']).toBe('application/x-www-form-urlencoded')
+    expect(options.body).toBe('username=admin&password=secret')
   })
 
   it('returns the token response from the API', async () => {

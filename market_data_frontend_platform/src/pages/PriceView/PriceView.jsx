@@ -25,9 +25,9 @@ export default function PriceView() {
   })
 
   const queryParams = {
-    start_date: dateRange.startDate,
-    end_date: dateRange.endDate,
-    limit: 500,
+    start_date: dateRange.startDate ? `${dateRange.startDate}T00:00:00.000Z` : undefined,
+    end_date: dateRange.endDate ? `${dateRange.endDate}T23:59:59.999Z` : undefined,
+    limit: 1000,
   }
 
   const pricesQuery = usePrices(id, queryParams)
@@ -35,13 +35,17 @@ export default function PriceView() {
 
   // Transform API payload to lightweight-charts candlestick format.
   // API returns Decimal fields as strings, so we parseFloat each OHLC value.
-  const chartData = (pricesQuery.data ?? []).map((p) => ({
-    time: p.timestamp.slice(0, 10),
-    open: parseFloat(p.open),
-    high: parseFloat(p.high),
-    low: parseFloat(p.low),
-    close: parseFloat(p.close),
-  }))
+  const chartData = (pricesQuery.data ?? [])
+    .map((p) => ({
+      // Lightweight charts uses UNIX timestamp (in seconds) for intraday data
+      time: Math.floor(new Date(p.timestamp).getTime() / 1000),
+      open: parseFloat(p.open),
+      high: parseFloat(p.high),
+      low: parseFloat(p.low),
+      close: parseFloat(p.close),
+    }))
+    // Lightweight-charts strictly requires data in ascending time order
+    .sort((a, b) => a.time - b.time)
 
   return (
     <div className={styles.page}>

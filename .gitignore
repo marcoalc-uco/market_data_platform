@@ -43,3 +43,7 @@ desktop.ini
 # ── Docker ───────────────────────────────────────────────────────────────────
 # (volumes and override files are local only)
 docker-compose.override.yml
+
+# ── Secrets ──────────────────────────────────────────────────────────────────
+# Docker secret files — never commit these to Git
+secrets/

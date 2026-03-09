@@ -87,12 +87,14 @@
 - [x] `src/components/LatestPriceSummary/` — summary card + test
 - [x] `src/pages/PriceView/` — page composition
 
-### Phase 6 — Integration & QA ⬜
+### Phase 6 — Integration & QA 🔄
 
 - [ ] Run full `QA_PROTOCOL.md` checklist
 - [ ] Coverage ≥ 80% globally, 100% on `src/api/`
 - [ ] `npm run build` → bundle size < 500 KB gzipped
-- [ ] Smoke test against live backend (login → instruments → chart)
+- [x] Smoke test against live backend (login → instruments → chart)
+- [x] Fix: Chart duplicate intraday timestamps and end-date cutoffs
+- [x] Fix: Global API client 401 Unauthorized handling (token redirect)
 - [ ] Dockerfile smoke test (build + serve at port 80)
 
 ---

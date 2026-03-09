@@ -32,7 +32,10 @@ export default function PriceChart({ symbol, data }) {
         vertLines: { color: '#f0f3fa' },
         horzLines: { color: '#f0f3fa' },
       },
-      timeScale: { borderColor: '#d1d4dc' },
+      timeScale: {
+        borderColor: '#d1d4dc',
+        timeVisible: true,
+      },
     })
 
     seriesRef.current = chartRef.current.addCandlestickSeries({
