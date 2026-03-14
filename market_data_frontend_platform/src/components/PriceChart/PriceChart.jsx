@@ -9,7 +9,7 @@ import styles from './PriceChart.module.css'
  * @param {Object}   props
  * @param {string}   props.symbol - Instrument symbol label (e.g. "AAPL").
  * @param {Array}    props.data   - Array of { time, open, high, low, close }.
- *                                  `time` must be a YYYY-MM-DD string.
+ *                                  `time` must be a UNIX timestamp in seconds (number).
  *                                  OHLC values must be numbers.
  */
 export default function PriceChart({ symbol, data }) {
@@ -70,7 +70,7 @@ PriceChart.propTypes = {
   symbol: PropTypes.string.isRequired,
   data: PropTypes.arrayOf(
     PropTypes.shape({
-      time: PropTypes.string.isRequired,
+      time: PropTypes.number.isRequired,
       open: PropTypes.number.isRequired,
       high: PropTypes.number.isRequired,
       low: PropTypes.number.isRequired,

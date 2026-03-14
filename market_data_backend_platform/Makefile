@@ -1,11 +1,12 @@
 # Makefile for Market Data Backend Platform
 
-.PHONY: dev test test-all test-cov test-integration docker-up docker-down freeze db-migrate db-upgrade db-downgrade db-status clean help
+.PHONY: dev lint test test-all test-cov test-integration docker-up docker-down freeze db-migrate db-upgrade db-downgrade db-status clean help
 
 # Default target
 help:
 	@echo Available commands:
 	@echo   make dev          - Start development server
+	@echo   make lint         - Run linters (black, isort, mypy)
 	@echo   make test         - Run unit tests
 	@echo   make test-all         - Run all tests including integration
 	@echo   make test-cov         - Run tests with coverage report
@@ -17,6 +18,12 @@ help:
 	@echo   make db-upgrade   - Apply pending migrations
 	@echo   make db-downgrade - Revert last migration
 	@echo   make clean        - Remove temporary files
+
+# Run linters: format check + type check
+lint:
+	.\.venv\Scripts\black.exe --check src/ tests/
+	.\.venv\Scripts\isort.exe --check-only src/ tests/
+	.\.venv\Scripts\mypy.exe src/
 
 # Start development server with hot reload
 dev:

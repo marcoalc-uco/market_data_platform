@@ -33,6 +33,9 @@ services:
       DEBUG: ${DEBUG:-false}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       SCHEDULER_ENABLED: false  # Disable scheduler in tests
+      ADMIN_EMAIL: admin@market.com
+      # bcrypt hash of 'adminpassword' — for integration test auth only, NOT production
+      ADMIN_PASSWORD_HASH: "$$2b$$12$$s6GcwpLKcoKl5x2JlnCmVextCYXxasNv/C.2tF8xH5Vkg2AWvjw/K"
     ports:
       - "8001:8000"  # Different port to avoid conflicts
     depends_on:
