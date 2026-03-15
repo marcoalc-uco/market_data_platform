@@ -1,17 +1,25 @@
-# CI Pipeline — Market Data Backend Platform
-# Runs code quality checks and unit tests on every push/PR.
-# Integration tests (requiring Docker/PostgreSQL) are excluded from CI.
+# CI — Backend (Market Data Backend Platform)
+# Runs on changes to market_data_backend_platform/ only.
+# Integration tests (requiring Docker/PostgreSQL) are excluded from CI — run locally via make backend-test-integration.
 
-name: CI
+name: CI Backend
 
 on:
   push:
     branches:
       - main
       - "feature/**"
+    paths:
+      - "market_data_backend_platform/**"
   pull_request:
     branches:
       - main
+    paths:
+      - "market_data_backend_platform/**"
+
+defaults:
+  run:
+    working-directory: market_data_backend_platform
 
 jobs:
   # ---------------------------------------------------------------------------
@@ -34,7 +42,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('market_data_backend_platform/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 
@@ -74,7 +82,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.txt') }}
+          key: ${{ runner.os }}-pip-${{ hashFiles('market_data_backend_platform/requirements.txt') }}
           restore-keys: |
             ${{ runner.os }}-pip-
 

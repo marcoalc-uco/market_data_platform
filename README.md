@@ -1,5 +1,8 @@
 # 📈 Market Data Platform
 
+[![CI Backend](https://github.com/marcoalc-uco/market_data_platform/actions/workflows/ci-backend.yml/badge.svg)](https://github.com/marcoalc-uco/market_data_platform/actions/workflows/ci-backend.yml)
+[![CI Frontend](https://github.com/marcoalc-uco/market_data_platform/actions/workflows/ci-frontend.yml/badge.svg)](https://github.com/marcoalc-uco/market_data_platform/actions/workflows/ci-frontend.yml)
+
 Full-stack platform for ingesting, storing, and visualizing financial market data (stocks, indices, crypto). Built with **FastAPI**, **React**, **PostgreSQL**, and **Grafana**.
 
 ```
