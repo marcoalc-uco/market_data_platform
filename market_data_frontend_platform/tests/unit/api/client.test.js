@@ -68,6 +68,28 @@ describe('apiClient.request', () => {
     expect(result).toBeNull()
   })
 
+  it('clears token and redirects to /login on 401', async () => {
+    localStorage.setItem('token', 'expired-token')
+    const hrefSpy = vi.fn()
+    Object.defineProperty(window, 'location', {
+      value: { href: '', set href(v) { hrefSpy(v); this._href = v }, get href() { return this._href } },
+      writable: true,
+      configurable: true,
+    })
+
+    fetch.mockResolvedValue({
+      ok: false,
+      status: 401,
+      statusText: 'Unauthorized',
+      json: () => Promise.resolve({ detail: 'Not authenticated' }),
+    })
+
+    await expect(apiClient.request('/api/v1/instruments')).rejects.toThrow('Session expired')
+
+    expect(localStorage.getItem('token')).toBeNull()
+    expect(hrefSpy).toHaveBeenCalledWith('/login')
+  })
+
   it('throws Error with backend detail message on non-OK response', async () => {
     fetch.mockResolvedValue({
       ok: false,

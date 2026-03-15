@@ -16,9 +16,9 @@
   "dependencies": {
     "@tanstack/react-query": "^5.0.0",
     "lightweight-charts": "^4.0.0",
+    "prop-types": "^15.8.0",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
-    "prop-types": "^15.8.0",
     "react-router-dom": "^6.26.0"
   },
   "devDependencies": {
@@ -26,6 +26,7 @@
     "@testing-library/react": "^16.0.0",
     "@testing-library/user-event": "^14.5.0",
     "@vitejs/plugin-react": "^4.3.0",
+    "@vitest/coverage-istanbul": "^2.1.9",
     "@vitest/coverage-v8": "^2.0.0",
     "eslint": "^8.57.0",
     "eslint-plugin-react": "^7.34.0",

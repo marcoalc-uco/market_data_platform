@@ -89,13 +89,13 @@
 
 ### Phase 6 — Integration & QA 🔄
 
-- [ ] Run full `QA_PROTOCOL.md` checklist
-- [ ] Coverage ≥ 80% globally, 100% on `src/api/`
-- [ ] `npm run build` → bundle size < 500 KB gzipped
+- [x] Run full `QA_PROTOCOL.md` checklist
+- [x] Coverage ≥ 80% globally, 100% on `src/api/`
+- [x] `npm run build` → bundle size < 500 KB gzipped
 - [x] Smoke test against live backend (login → instruments → chart)
 - [x] Fix: Chart duplicate intraday timestamps and end-date cutoffs
 - [x] Fix: Global API client 401 Unauthorized handling (token redirect)
-- [ ] Dockerfile smoke test (build + serve at port 80)
+- [x] Dockerfile smoke test (build + serve at port 80)
 
 ---
 

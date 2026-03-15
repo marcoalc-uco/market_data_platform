@@ -9,15 +9,14 @@ export default defineConfig({
     setupFiles: './src/test/setup.js',
     passWithNoTests: true,
     coverage: {
-      provider: 'v8',
+      provider: 'istanbul',
       reporter: ['text', 'lcov'],
       include: ['src/**/*.{js,jsx}'],
       exclude: [
         'src/main.jsx',
         'src/test/**',
       ],
-      // Thresholds enforced from Phase 2 onwards (when tests exist)
-      // thresholds: { lines: 80, functions: 80, branches: 80, statements: 80 },
+      thresholds: { lines: 80, functions: 80, branches: 80, statements: 80 },
     },
   },
 })
