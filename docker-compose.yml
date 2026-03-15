@@ -29,10 +29,11 @@ services:
       dockerfile: docker/Dockerfile
     container_name: market_data_api
     restart: always
-    # NOTE: ADMIN_PASSWORD_HASH is passed via Docker Secrets (mounted at
-    # /run/secrets/admin_password_hash) — pydantic-settings reads it automatically
-    # via secrets_dir="/run/secrets". This avoids '$' interpolation issues and
-    # prevents the hash from appearing in docker inspect.
+    # Secrets are mounted at /run/secrets/<name> — pydantic-settings reads them
+    # automatically via secrets_dir="/run/secrets".
+    # - admin_password_hash: bcrypt hash contains '$' which docker-compose would
+    #   interpolate incorrectly if passed as env var.
+    # - secret_key: JWT signing key — never exposed in env vars or docker inspect.
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-market_data}:${POSTGRES_PASSWORD:-market_data_pass}@postgres:5432/${POSTGRES_DB:-market_data}
       API_PREFIX: /api/v1
@@ -43,6 +44,7 @@ services:
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@market.com}
     secrets:
       - admin_password_hash
+      - secret_key
     ports:
       - "8000:8000"
     depends_on:
@@ -111,3 +113,5 @@ networks:
 secrets:
   admin_password_hash:
     file: ./secrets/admin_password_hash.txt
+  secret_key:
+    file: ./secrets/secret_key.txt

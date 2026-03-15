@@ -34,7 +34,10 @@ services:
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
       SCHEDULER_ENABLED: false  # Disable scheduler in tests
       ADMIN_EMAIL: admin@market.com
-      # bcrypt hash of 'adminpassword' — for integration test auth only, NOT production
+      # Explicit test values — hardcoded intentionally for isolated test environment only, NOT production.
+      # SECRET_KEY: hex string, no '$' interpolation issues.
+      # ADMIN_PASSWORD_HASH: bcrypt hash of 'adminpassword', escaped with '$$' for docker-compose.
+      SECRET_KEY: "test-secret-key-for-integration-tests-only-do-not-use-in-production"
       ADMIN_PASSWORD_HASH: "$$2b$$12$$s6GcwpLKcoKl5x2JlnCmVextCYXxasNv/C.2tF8xH5Vkg2AWvjw/K"
     ports:
       - "8001:8000"  # Different port to avoid conflicts

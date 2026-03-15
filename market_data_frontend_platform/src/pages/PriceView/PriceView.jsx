@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { usePrices } from '../../hooks/usePrices.js'
 import { useLatestPrice } from '../../hooks/useLatestPrice.js'
+import { useInstrument } from '../../hooks/useInstrument.js'
 import PriceChart from '../../components/PriceChart/PriceChart.jsx'
 import DateRangePicker from '../../components/DateRangePicker/DateRangePicker.jsx'
 import LatestPriceSummary from '../../components/LatestPriceSummary/LatestPriceSummary.jsx'
@@ -32,6 +33,7 @@ export default function PriceView() {
 
   const pricesQuery = usePrices(id, queryParams)
   const latestQuery = useLatestPrice(id)
+  const instrumentQuery = useInstrument(id)
 
   // Transform API payload to lightweight-charts candlestick format.
   // API returns Decimal fields as strings, so we parseFloat each OHLC value.
@@ -53,7 +55,9 @@ export default function PriceView() {
         <button className={styles.back} onClick={() => navigate('/instruments')}>
           ← Back to Instruments
         </button>
-        <h1 className={styles.title}>Price History — Instrument #{id}</h1>
+        <h1 className={styles.title}>
+          Price History — {instrumentQuery.data?.name || `Instrument #${id}`}
+        </h1>
       </header>
 
       <section className={styles.section}>
@@ -88,7 +92,7 @@ export default function PriceView() {
       )}
       {chartData.length > 0 && (
         <section className={styles.section}>
-          <PriceChart symbol={`Instrument #${id}`} data={chartData} />
+          <PriceChart symbol={instrumentQuery.data?.name || `Instrument #${id}`} data={chartData} />
         </section>
       )}
     </div>

@@ -95,9 +95,8 @@ class Settings(BaseSettings):
 
     # Auth - JWT
     secret_key: str = Field(
-        default="changeme-generate-with-openssl-rand-hex-32",
         repr=False,
-        description="Secret key for signing JWT tokens",
+        description="Secret key for signing JWT tokens. Loaded from Docker secret /run/secrets/secret_key.",
     )
     access_token_expire_minutes: int = Field(
         default=30,
@@ -169,7 +168,9 @@ def get_settings() -> Settings:
     Returns:
         Settings: Cached application settings.
     """
-    return Settings()
+    # Mypy requires required fields to be explicitly passed or ignored.
+    # In Pydantic Settings, they are populated from env/secrets.
+    return Settings()  # type: ignore[call-arg]
 
 
 # Convenience instance for direct import
