@@ -20,6 +20,7 @@ Example::
 """
 
 from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.triggers.cron import CronTrigger
 from apscheduler.triggers.interval import IntervalTrigger
 
 from market_data_backend_platform.core import get_logger
@@ -27,6 +28,7 @@ from market_data_backend_platform.core.config import settings
 from market_data_backend_platform.db.session import SessionLocal
 from market_data_backend_platform.etl.clients.yahoo import YahooFinanceClient
 from market_data_backend_platform.etl.services.ingestion import IngestionService
+from market_data_backend_platform.models.instrument import InstrumentType
 from market_data_backend_platform.repositories.instrument import (
     InstrumentRepository,
 )
@@ -40,45 +42,69 @@ logger = get_logger(__name__)
 _scheduler: BackgroundScheduler | None = None
 
 
-def run_ingestion_job() -> None:
-    """Execute the ingestion job.
+# Instrument types that support intraday data (5m candles from Yahoo Finance)
+_INTRADAY_TYPES = [InstrumentType.STOCK, InstrumentType.CRYPTO]
 
-    Creates a new database session, runs ingestion for all active
-    instruments, then closes the session.
-    """
-    logger.info("scheduler_job_started")
+# Instrument types that only support daily data (no intraday quotes available)
+_DAILY_ONLY_TYPES = [InstrumentType.INDEX]
 
+
+def _build_service(session: object) -> IngestionService:
+    return IngestionService(
+        instrument_repo=InstrumentRepository(session),  # type: ignore[arg-type]
+        price_repo=MarketPriceRepository(session),  # type: ignore[arg-type]
+        yahoo_client=YahooFinanceClient(),
+    )
+
+
+def run_intraday_job() -> None:
+    """Ingest intraday data (5m candles) for STOCK and CRYPTO instruments."""
+    logger.info("scheduler_intraday_job_started")
     session = SessionLocal()
     try:
-        service = IngestionService(
-            instrument_repo=InstrumentRepository(session),
-            price_repo=MarketPriceRepository(session),
-            yahoo_client=YahooFinanceClient(),
-        )
-
-        result = service.ingest_all_active(
+        result = _build_service(session).ingest_all_active(
             interval="5m",
             period="1d",
+            instrument_types=_INTRADAY_TYPES,
         )
-
-        logger.info(
-            "scheduler_job_complete",
-            total_instruments=result["total_instruments"],
-            total_inserted=result["total_inserted"],
-            failed=result["failed"],
-        )
+        logger.info("scheduler_intraday_job_complete", **result)
     except Exception as exc:  # pylint: disable=broad-except
-        logger.error("scheduler_job_failed", error=str(exc))
+        logger.error("scheduler_intraday_job_failed", error=str(exc))
+    finally:
+        session.close()
+
+
+def run_daily_job() -> None:
+    """Ingest daily data (1d candles) for INDEX instruments.
+
+    INDEX instruments (e.g. mutual funds, index funds) do not publish
+    intraday quotes on Yahoo Finance — requesting a 5m interval returns
+    an error. This job runs once per day after market close.
+    """
+    logger.info("scheduler_daily_job_started")
+    session = SessionLocal()
+    try:
+        result = _build_service(session).ingest_all_active(
+            interval="1d",
+            period="1y",
+            instrument_types=_DAILY_ONLY_TYPES,
+        )
+        logger.info("scheduler_daily_job_complete", **result)
+    except Exception as exc:  # pylint: disable=broad-except
+        logger.error("scheduler_daily_job_failed", error=str(exc))
     finally:
         session.close()
 
 
 def start_scheduler(interval_minutes: int | None = None) -> None:
-    """Start the background scheduler.
+    """Start the background scheduler with two jobs:
+
+    - Intraday job: fetches 5m candles for STOCK/CRYPTO every N minutes.
+    - Daily job: fetches 1d candles for INDEX instruments once per day at 18:30.
 
     Args:
-        interval_minutes: Minutes between ingestion runs.
-            Defaults to settings.INGESTION_INTERVAL_MINUTES.
+        interval_minutes: Minutes between intraday runs.
+            Defaults to settings.ingestion_interval_minutes.
     """
     global _scheduler  # pylint: disable=global-statement
 
@@ -89,18 +115,32 @@ def start_scheduler(interval_minutes: int | None = None) -> None:
     interval = interval_minutes or getattr(settings, "ingestion_interval_minutes", 60)
 
     _scheduler = BackgroundScheduler()
+
+    # Intraday job — STOCK and CRYPTO (supports 5m candles)
     _scheduler.add_job(
-        run_ingestion_job,
+        run_intraday_job,
         trigger=IntervalTrigger(minutes=interval),
-        id="ingestion_job",
-        name="Market Data Ingestion",
+        id="intraday_ingestion_job",
+        name="Intraday Market Data Ingestion (STOCK, CRYPTO)",
         replace_existing=True,
     )
+
+    # Daily job — INDEX instruments (no intraday data available on Yahoo Finance)
+    # Runs at 17:30 Europe/Madrid (handles DST automatically: UTC+1 winter, UTC+2 summer)
+    _scheduler.add_job(
+        run_daily_job,
+        trigger=CronTrigger(hour=18, minute=00, timezone="Europe/Madrid"),
+        id="daily_ingestion_job",
+        name="Daily Market Data Ingestion (INDEX)",
+        replace_existing=True,
+    )
+
     _scheduler.start()
 
     logger.info(
         "scheduler_started",
-        interval_minutes=interval,
+        intraday_interval_minutes=interval,
+        daily_job_time="17:30 Europe/Madrid",
     )
 
 

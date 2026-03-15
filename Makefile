@@ -1,17 +1,21 @@
 # Makefile — market_data_platform (monorepo root)
 # Delegates to service-level Makefiles. Requires GNU Make.
 
-.PHONY: up up-dev down down-clean logs logs-api logs-frontend \
+.PHONY: up build up-dev down down-clean prune logs logs-api logs-frontend \
         backend-dev backend-test backend-test-integration backend-test-all backend-test-cov \
         backend-lint backend-migrate backend-upgrade \
         frontend-install frontend-dev frontend-build frontend-lint frontend-test \
         check-all check-all-integration help
 
 # ── Full Stack ────────────────────────────────────────────────────────────────
-up:           ## Start all services (production-like) + open logs in new window
+up:           ## Start all services (no rebuild — use 'make build' after code changes)
+	docker-compose up -d
+	docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
+	start cmd /k "docker-compose logs -f"
+
+build:        ## Rebuild images and restart (use after code changes)
 	docker-compose up -d --build
 	docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
-	@echo Services started. Opening logs window...
 	start cmd /k "docker-compose logs -f"
 
 up-dev:       ## Start all services with hot reload (logs in same terminal)
@@ -20,8 +24,12 @@ up-dev:       ## Start all services with hot reload (logs in same terminal)
 down:         ## Stop all services
 	docker-compose down
 
-down-clean:   ## Stop and remove volumes (fresh start)
-	docker-compose down -v
+down-clean:   ## Stop and remove volumes + local images (full reset)
+	docker-compose down -v --rmi local
+
+prune:        ## Remove dangling images and unused build cache (free disk/memory)
+	docker image prune -f
+	docker builder prune -f
 
 logs:         ## Follow logs for all services
 	docker-compose logs -f

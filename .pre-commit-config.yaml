@@ -90,8 +90,8 @@ repos:
   - repo: local
     hooks:
       - id: prettier
-        name: Prettier check (frontend)
-        entry: bash -c "if [ -f market_data_frontend_platform/package.json ]; then cd market_data_frontend_platform && npm run format:check; fi"
+        name: Prettier (frontend)
+        entry: bash -c "if [ -f market_data_frontend_platform/package.json ]; then cd market_data_frontend_platform && npm run format; fi"
         language: system
         files: ^market_data_frontend_platform/src/
         stages: [pre-commit]
