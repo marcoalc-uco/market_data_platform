@@ -3,6 +3,8 @@
 [![CI Backend](https://github.com/marcoalc-uco/market_data_platform/actions/workflows/ci-backend.yml/badge.svg)](https://github.com/marcoalc-uco/market_data_platform/actions/workflows/ci-backend.yml)
 [![CI Frontend](https://github.com/marcoalc-uco/market_data_platform/actions/workflows/ci-frontend.yml/badge.svg)](https://github.com/marcoalc-uco/market_data_platform/actions/workflows/ci-frontend.yml)
 
+![Market Data Platform](docs/instrument.png)
+
 Full-stack platform for ingesting, storing, and visualizing financial market data (stocks, indices, crypto). Built with **FastAPI**, **React**, **PostgreSQL**, and **Grafana**.
 
 ```
@@ -79,14 +81,14 @@ make up-dev
 
 ### 4. Access services
 
-| Service         | URL                         | Notes                     |
-| --------------- | --------------------------- | ------------------------- |
-| Frontend        | http://localhost:80          | Production (Nginx)        |
-| Frontend (dev)  | http://localhost:5173        | Vite dev server           |
-| Backend API     | http://localhost:8000        | FastAPI                   |
-| API Docs        | http://localhost:8000/docs   | Swagger UI                |
-| Grafana         | http://localhost:3000        | Default: admin / admin    |
-| PostgreSQL      | localhost:5432               | DB: market_data           |
+| Service        | URL                        | Notes                  |
+| -------------- | -------------------------- | ---------------------- |
+| Frontend       | http://localhost:80        | Production (Nginx)     |
+| Frontend (dev) | http://localhost:5173      | Vite dev server        |
+| Backend API    | http://localhost:8000      | FastAPI                |
+| API Docs       | http://localhost:8000/docs | Swagger UI             |
+| Grafana        | http://localhost:3000      | Default: admin / admin |
+| PostgreSQL     | localhost:5432             | DB: market_data        |
 
 ---
 
@@ -154,20 +156,20 @@ market_data_platform/
 
 Run `make help` to see all commands. Key ones:
 
-| Command                    | Description                              |
-| -------------------------- | ---------------------------------------- |
-| `make up`                  | Start all services (production-like)     |
-| `make up-dev`              | Start with hot-reload                    |
-| `make down`                | Stop all services                        |
-| `make down-clean`          | Stop and remove volumes (fresh start)    |
-| `make logs`                | Follow logs for all services             |
-| `make backend-test`        | Run backend unit tests                   |
-| `make backend-test-cov`    | Backend tests with coverage report       |
-| `make backend-lint`        | Run backend linting (black, isort, mypy) |
-| `make frontend-test`       | Run frontend tests (Vitest)              |
-| `make frontend-lint`       | Run frontend linting (ESLint + Prettier) |
-| `make frontend-build`      | Build frontend for production            |
-| `make check-all`           | Run all quality checks                   |
+| Command                 | Description                              |
+| ----------------------- | ---------------------------------------- |
+| `make up`               | Start all services (production-like)     |
+| `make up-dev`           | Start with hot-reload                    |
+| `make down`             | Stop all services                        |
+| `make down-clean`       | Stop and remove volumes (fresh start)    |
+| `make logs`             | Follow logs for all services             |
+| `make backend-test`     | Run backend unit tests                   |
+| `make backend-test-cov` | Backend tests with coverage report       |
+| `make backend-lint`     | Run backend linting (black, isort, mypy) |
+| `make frontend-test`    | Run frontend tests (Vitest)              |
+| `make frontend-lint`    | Run frontend linting (ESLint + Prettier) |
+| `make frontend-build`   | Build frontend for production            |
+| `make check-all`        | Run all quality checks                   |
 
 ---
 
@@ -175,33 +177,33 @@ Run `make help` to see all commands. Key ones:
 
 ### Backend
 
-| Layer         | Technology                 |
-| ------------- | -------------------------- |
-| Framework     | FastAPI + Uvicorn          |
-| ORM           | SQLAlchemy 2.x             |
-| Migrations    | Alembic                    |
-| Validation    | Pydantic 2.x               |
-| Auth          | JWT (PyJWT) + bcrypt       |
-| Scheduler     | APScheduler                |
-| Database      | PostgreSQL 16              |
-| Logging       | structlog (JSON)           |
-| Testing       | pytest + httpx             |
-| Quality       | black + isort + mypy       |
-| Python        | 3.14+                      |
+| Layer      | Technology           |
+| ---------- | -------------------- |
+| Framework  | FastAPI + Uvicorn    |
+| ORM        | SQLAlchemy 2.x       |
+| Migrations | Alembic              |
+| Validation | Pydantic 2.x         |
+| Auth       | JWT (PyJWT) + bcrypt |
+| Scheduler  | APScheduler          |
+| Database   | PostgreSQL 16        |
+| Logging    | structlog (JSON)     |
+| Testing    | pytest + httpx       |
+| Quality    | black + isort + mypy |
+| Python     | 3.14+                |
 
 ### Frontend
 
-| Layer         | Technology                 |
-| ------------- | -------------------------- |
-| Framework     | React 18                   |
-| Build         | Vite 5                     |
-| Server state  | TanStack Query v5          |
-| Charts        | lightweight-charts 4       |
-| Routing       | react-router-dom v6        |
-| Styling       | CSS Modules                |
-| Testing       | Vitest + React Testing Lib |
-| Quality       | ESLint 8 + Prettier        |
-| Production    | Nginx (Alpine)             |
+| Layer        | Technology                 |
+| ------------ | -------------------------- |
+| Framework    | React 18                   |
+| Build        | Vite 5                     |
+| Server state | TanStack Query v5          |
+| Charts       | lightweight-charts 4       |
+| Routing      | react-router-dom v6        |
+| Styling      | CSS Modules                |
+| Testing      | Vitest + React Testing Lib |
+| Quality      | ESLint 8 + Prettier        |
+| Production   | Nginx (Alpine)             |
 
 ---
 
@@ -209,18 +211,18 @@ Run `make help` to see all commands. Key ones:
 
 Full OpenAPI documentation available at `http://localhost:8000/docs` when the backend is running.
 
-| Method | Endpoint                                | Auth | Description            |
-| ------ | --------------------------------------- | ---- | ---------------------- |
-| GET    | `/health`                               | No   | Health check           |
-| POST   | `/api/v1/auth/token`                    | No   | Login (returns JWT)    |
-| GET    | `/api/v1/instruments`                   | Yes  | List instruments       |
-| GET    | `/api/v1/instruments/{id}`              | Yes  | Get instrument         |
-| POST   | `/api/v1/instruments`                   | Yes  | Create instrument      |
-| PUT    | `/api/v1/instruments/{id}`              | Yes  | Update instrument      |
-| DELETE | `/api/v1/instruments/{id}`              | Yes  | Delete instrument      |
-| GET    | `/api/v1/prices/{instrument_id}`        | Yes  | Get OHLCV prices       |
-| GET    | `/api/v1/prices/{instrument_id}/latest` | Yes  | Get latest price       |
-| POST   | `/api/v1/ingest/run`                    | Yes  | Trigger ETL manually   |
+| Method | Endpoint                                | Auth | Description          |
+| ------ | --------------------------------------- | ---- | -------------------- |
+| GET    | `/health`                               | No   | Health check         |
+| POST   | `/api/v1/auth/token`                    | No   | Login (returns JWT)  |
+| GET    | `/api/v1/instruments`                   | Yes  | List instruments     |
+| GET    | `/api/v1/instruments/{id}`              | Yes  | Get instrument       |
+| POST   | `/api/v1/instruments`                   | Yes  | Create instrument    |
+| PUT    | `/api/v1/instruments/{id}`              | Yes  | Update instrument    |
+| DELETE | `/api/v1/instruments/{id}`              | Yes  | Delete instrument    |
+| GET    | `/api/v1/prices/{instrument_id}`        | Yes  | Get OHLCV prices     |
+| GET    | `/api/v1/prices/{instrument_id}/latest` | Yes  | Get latest price     |
+| POST   | `/api/v1/ingest/run`                    | Yes  | Trigger ETL manually |
 
 ---
 
@@ -228,11 +230,11 @@ Full OpenAPI documentation available at `http://localhost:8000/docs` when the ba
 
 Three `.env.example` files exist at different levels:
 
-| File | Scope | Key variables |
-| ---- | ----- | ------------- |
-| `.env.example` (root) | Docker Compose orchestration | `POSTGRES_*`, `GRAFANA_*`, `SECRET_KEY`, `ADMIN_EMAIL` |
-| `market_data_backend_platform/.env.example` | Local backend development | `DB_HOST`, `DATABASE_URL`, `CORS_ORIGINS`, `SCHEDULER_ENABLED` |
-| `market_data_frontend_platform/.env.example` | Local frontend development | `VITE_API_URL` |
+| File                                         | Scope                        | Key variables                                                  |
+| -------------------------------------------- | ---------------------------- | -------------------------------------------------------------- |
+| `.env.example` (root)                        | Docker Compose orchestration | `POSTGRES_*`, `GRAFANA_*`, `SECRET_KEY`, `ADMIN_EMAIL`         |
+| `market_data_backend_platform/.env.example`  | Local backend development    | `DB_HOST`, `DATABASE_URL`, `CORS_ORIGINS`, `SCHEDULER_ENABLED` |
+| `market_data_frontend_platform/.env.example` | Local frontend development   | `VITE_API_URL`                                                 |
 
 When running via Docker Compose, only the root `.env` is needed. Service-specific `.env` files are for local development outside containers.
 
@@ -267,12 +269,12 @@ make check-all             # Backend lint + tests, frontend lint + tests
 
 Detailed documentation lives in each service's `docs/` directory:
 
-| Document | Backend | Frontend | Description |
-| -------- | ------- | -------- | ----------- |
-| `architecture.md` | Yes | Yes | Component design, data flows, project structure |
-| `PRD.md` | Yes | Yes | Feature scope and API contracts |
-| `QA_PROTOCOL.md` | Yes | Yes | Test commands and coverage targets |
-| `GRAFANA.md` | Yes | -- | Dashboard guide, SQL queries, troubleshooting |
+| Document          | Backend | Frontend | Description                                     |
+| ----------------- | ------- | -------- | ----------------------------------------------- |
+| `architecture.md` | Yes     | Yes      | Component design, data flows, project structure |
+| `PRD.md`          | Yes     | Yes      | Feature scope and API contracts                 |
+| `QA_PROTOCOL.md`  | Yes     | Yes      | Test commands and coverage targets              |
+| `GRAFANA.md`      | Yes     | --       | Dashboard guide, SQL queries, troubleshooting   |
 
 System-level architecture: `docs/architecture.md` (monorepo root).
 
