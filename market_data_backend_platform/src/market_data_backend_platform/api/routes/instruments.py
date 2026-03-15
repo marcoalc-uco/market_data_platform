@@ -3,12 +3,13 @@
 This module provides CRUD operations for financial instruments.
 """
 
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, Query, status
 
 from market_data_backend_platform.api.dependencies import (
     InstrumentRepoDep,
     MarketPriceRepoDep,
 )
+from market_data_backend_platform.models.instrument import InstrumentType
 from market_data_backend_platform.schemas import (
     InstrumentCreate,
     InstrumentResponse,
@@ -20,16 +21,37 @@ router = APIRouter()
 
 
 @router.get("", response_model=list[InstrumentResponse])
-def list_instruments(repo: InstrumentRepoDep) -> list[InstrumentResponse]:
-    """List all instruments.
+def list_instruments(
+    repo: InstrumentRepoDep,
+    asset_type: InstrumentType | None = Query(
+        None,
+        description="Filter by instrument type (stock | index | crypto)",
+    ),
+    is_active: bool | None = Query(
+        None,
+        description="Filter by active status",
+    ),
+    skip: int = Query(0, ge=0, description="Number of records to skip"),
+    limit: int = Query(20, ge=1, le=100, description="Maximum records to return"),
+) -> list[InstrumentResponse]:
+    """List instruments with optional filters and pagination.
 
     Args:
         repo: InstrumentRepository from dependency injection.
+        asset_type: Optional filter by instrument type.
+        is_active: Optional filter by active status.
+        skip: Pagination offset.
+        limit: Page size (max 100).
 
     Returns:
-        List of all instruments.
+        Filtered and paginated list of instruments.
     """
-    instruments = repo.get_all()
+    instruments = repo.list_filtered(
+        instrument_type=asset_type,
+        is_active=is_active,
+        skip=skip,
+        limit=limit,
+    )
     return [InstrumentResponse.model_validate(i) for i in instruments]
 
 

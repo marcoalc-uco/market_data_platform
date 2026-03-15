@@ -29,18 +29,20 @@ services:
       dockerfile: docker/Dockerfile
     container_name: market_data_api
     restart: always
-    # NOTE: env_file is intentionally omitted.
-    # ADMIN_PASSWORD_HASH and SECRET_KEY contain '$' characters that docker-compose
-    # interpolates as variable references, corrupting the values.
-    # All required settings are either set explicitly below or use config.py defaults.
+    # NOTE: ADMIN_PASSWORD_HASH is passed via Docker Secrets (mounted at
+    # /run/secrets/admin_password_hash) — pydantic-settings reads it automatically
+    # via secrets_dir="/run/secrets". This avoids '$' interpolation issues and
+    # prevents the hash from appearing in docker inspect.
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-market_data}:${POSTGRES_PASSWORD:-market_data_pass}@postgres:5432/${POSTGRES_DB:-market_data}
       API_PREFIX: /api/v1
       DEBUG: ${DEBUG:-false}
       LOG_LEVEL: ${LOG_LEVEL:-INFO}
-      INGESTION_INTERVAL_MINUTES: ${INGESTION_INTERVAL_MINUTES:-60}
+      INGESTION_INTERVAL_MINUTES: ${INGESTION_INTERVAL_MINUTES:-5}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@market.com}
+    secrets:
+      - admin_password_hash
     ports:
       - "8000:8000"
     depends_on:
@@ -58,6 +60,7 @@ services:
     networks:
       - platform
 
+
   frontend:
     build:
       context: ./market_data_frontend_platform
@@ -65,8 +68,6 @@ services:
       target: production
     container_name: market_data_frontend
     restart: always
-    environment:
-      - VITE_API_URL=${VITE_API_URL:-http://localhost:8000}
     ports:
       - "80:80"
     depends_on:
@@ -106,3 +107,7 @@ volumes:
 networks:
   platform:
     driver: bridge
+
+secrets:
+  admin_password_hash:
+    file: ./secrets/admin_password_hash.txt

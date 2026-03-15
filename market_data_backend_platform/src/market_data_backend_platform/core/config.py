@@ -40,6 +40,7 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
+        secrets_dir="/run/secrets",
         extra="ignore",
     )
 
@@ -108,9 +109,19 @@ class Settings(BaseSettings):
         description="Admin user email for login",
     )
     admin_password_hash: str = Field(
-        default="$2b$12$B9NxCdpM3Tz3YnxkXTqaw.trJaR.lz0bz9uzK5X56Au2FVuV23aLG",
+        default="",
         repr=False,
-        description="Bcrypt hash of admin password (set via ADMIN_PASSWORD_HASH env var)",
+        description="Bcrypt hash of admin password. Loaded from Docker secret /run/secrets/admin_password_hash.",
+    )
+
+    # CORS
+    cors_origins: list[str] = Field(
+        default=["http://localhost:5173"],
+        description=(
+            "Allowed CORS origins. Set to the frontend URL(s) in production, "
+            "e.g. https://app.example.com. "
+            "Never use ['*'] together with allow_credentials=True."
+        ),
     )
 
     # Scheduler

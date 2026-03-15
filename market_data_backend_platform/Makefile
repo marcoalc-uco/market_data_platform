@@ -1,24 +1,32 @@
 # Makefile for Market Data Backend Platform
 
-.PHONY: dev test test-all test-cov test-integration docker-up docker-down freeze db-migrate db-upgrade db-downgrade db-status clean help
+.PHONY: dev lint test test-all test-cov test-integration freeze db-migrate db-upgrade db-downgrade db-status clean help
 
 # Default target
 help:
 	@echo Available commands:
-	@echo   make dev          - Start development server
-	@echo   make test         - Run unit tests
+	@echo   make dev              - Start local dev server (uvicorn --reload)
+	@echo   make lint             - Run linters (black, isort, mypy)
+	@echo   make test             - Run unit tests
 	@echo   make test-all         - Run all tests including integration
 	@echo   make test-cov         - Run tests with coverage report
 	@echo   make test-integration - Run integration tests with Docker
-	@echo   make docker-up        - Start Docker Compose services
-	@echo   make docker-down      - Stop Docker Compose services
 	@echo   make freeze           - Update requirements.txt from virtual environment
-	@echo   make db-migrate   - Generate Alembic migration (requires PostgreSQL)
-	@echo   make db-upgrade   - Apply pending migrations
-	@echo   make db-downgrade - Revert last migration
-	@echo   make clean        - Remove temporary files
+	@echo   make db-migrate       - Generate Alembic migration (requires PostgreSQL)
+	@echo   make db-upgrade       - Apply pending migrations
+	@echo   make db-downgrade     - Revert last migration
+	@echo   make clean            - Remove temporary files
+	@echo.
+	@echo   Full-stack Docker: use 'make up / make up-dev' from the monorepo root
 
-# Start development server with hot reload
+# Run linters: format check + type check
+lint:
+	.\.venv\Scripts\black.exe --check src/ tests/
+	.\.venv\Scripts\isort.exe --check-only src/ tests/
+	.\.venv\Scripts\mypy.exe src/
+
+# Start local development server with hot reload (no Docker needed)
+# Requires: PostgreSQL running locally or via 'make up' from root
 dev:
 	.\.venv\Scripts\uvicorn.exe market_data_backend_platform.main:app --reload --host 0.0.0.0 --port 8000
 
@@ -47,17 +55,6 @@ test-integration:
 	.\.venv\Scripts\pytest.exe tests/integration/ -v
 	@echo Stopping TEST Docker Compose services...
 	docker-compose -f docker-compose.test.yml down -v
-
-# Start Docker Compose services
-docker-up:
-	docker-compose up -d --build
-	docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
-	@echo Services started.
-
-# Stop Docker Compose services
-docker-down:
-	docker-compose down
-	@echo Services stopped.
 
 # Freeze dependencies into requirements.txt (guarantees UTF-8 and LF)
 freeze:

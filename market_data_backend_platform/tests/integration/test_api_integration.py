@@ -42,7 +42,7 @@ class TestInstrumentsCRUD:
         instrument_data = {
             "symbol": unique_symbol,
             "name": "Test Instrument",
-            "instrument_type": "stock",
+            "asset_type": "stock",
             "exchange": "NASDAQ",
         }
 
@@ -52,7 +52,7 @@ class TestInstrumentsCRUD:
         data = response.json()
         assert data["symbol"] == unique_symbol
         assert data["name"] == "Test Instrument"
-        assert data["instrument_type"] == "stock"
+        assert data["asset_type"] == "stock"
         assert "id" in data
 
     def test_get_instrument_by_id(self, api_client: httpx.Client) -> None:
@@ -62,7 +62,7 @@ class TestInstrumentsCRUD:
         instrument_data = {
             "symbol": unique_symbol,
             "name": "Get Test Instrument",
-            "instrument_type": "stock",
+            "asset_type": "stock",
             "exchange": "NASDAQ",
         }
         create_response = api_client.post("/api/v1/instruments", json=instrument_data)
@@ -92,7 +92,7 @@ class TestMarketPrices:
         instrument_data = {
             "symbol": unique_symbol,
             "name": "Price Test Instrument",
-            "instrument_type": "stock",
+            "asset_type": "stock",
             "exchange": "NASDAQ",
         }
         inst_response = api_client.post("/api/v1/instruments", json=instrument_data)
@@ -117,7 +117,7 @@ class TestMarketPrices:
         instrument_data = {
             "symbol": unique_symbol,
             "name": "Latest Test Instrument",
-            "instrument_type": "stock",
+            "asset_type": "stock",
             "exchange": "NASDAQ",
         }
         inst_response = api_client.post("/api/v1/instruments", json=instrument_data)

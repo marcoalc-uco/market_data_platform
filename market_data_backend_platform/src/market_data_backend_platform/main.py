@@ -70,10 +70,12 @@ app = FastAPI(
 
 
 # Configure CORS middleware
-# Allows frontend applications to call this API
+# Origins are loaded from CORS_ORIGINS env var (default: http://localhost:5173).
+# IMPORTANT: allow_origins=["*"] is incompatible with allow_credentials=True —
+# browsers will reject the response. Always use explicit origins in production.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure properly in production
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
