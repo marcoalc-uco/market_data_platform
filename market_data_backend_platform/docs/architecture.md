@@ -115,10 +115,6 @@ market_data_backend_platform/
 │       │   ├── instrument.py          # Instrument repository
 │       │   └── market_price.py        # MarketPrice repository
 │       │
-│       ├── services/                  # Business Logic Layer
-│       │   ├── instrument.py          # Instrument service
-│       │   └── market_price.py        # MarketPrice service
-│       │
 │       ├── etl/                       # Data Ingestion
 │       │   ├── clients/               # External API clients
 │       │   │   └── yahoo.py           # Yahoo Finance client
@@ -153,10 +149,9 @@ market_data_backend_platform/
 │
 ├── docs/
 │   ├── PRD.md                         # Product requirements
-│   ├── DEV_PLAN.md                    # Execution plan
 │   ├── QA_PROTOCOL.md                 # Quality checklist
-│   ├── architecture.md (this file)    # System architecture
-│   └── roadmap.md                     # Development roadmap
+│   ├── GRAFANA.md                     # Grafana dashboard guide
+│   └── architecture.md (this file)    # System architecture
 │
 ├── scripts/
 │   ├── validate_against_prd.py        # PRD compliance check
@@ -219,37 +214,7 @@ class Repository(Protocol[T]):
 
 ---
 
-### 3. Service Layer (`services/`)
-
-**Purpose:** Orchestrate business operations
-
-**Responsibilities:**
-
-- Coordinate multiple repository calls
-- Apply business rules
-- Handle transactions
-- Emit structured logs
-
-**Example Flow:**
-
-```python
-# services/instrument.py
-class InstrumentService:
-    def __init__(self, repository: InstrumentRepository):
-        self.repository = repository
-
-    def activate_instrument(self, instrument_id: int) -> Instrument:
-        instrument = self.repository.get_by_id(instrument_id)
-        if not instrument:
-            raise InstrumentNotFoundError(instrument_id)
-
-        instrument.is_active = True
-        return self.repository.update(instrument)
-```
-
----
-
-### 4. ETL Pipeline (`etl/`)
+### 3. ETL Pipeline (`etl/`)
 
 **Architecture:**
 
@@ -284,7 +249,7 @@ External API → Client → Transformer → Repository → Database
 
 ---
 
-### 5. Database Layer
+### 4. Database Layer
 
 #### PostgreSQL/TimescaleDB
 
@@ -321,7 +286,7 @@ alembic downgrade -1
 
 ---
 
-### 6. REST API (`api/routes/`)
+### 5. REST API (`api/routes/`)
 
 **Versioning:** `/api/v1/*`
 
@@ -347,7 +312,7 @@ alembic downgrade -1
 
 ---
 
-### 7. Scheduler (`scheduler/`)
+### 6. Scheduler (`scheduler/`)
 
 **Purpose:** Automated periodic data ingestion
 
@@ -375,7 +340,7 @@ scheduler.add_job(
 
 ---
 
-### 8. Grafana Visualization
+### 7. Grafana Visualization
 
 **Architecture:**
 
@@ -677,6 +642,6 @@ All logs are JSON-formatted:
 
 ---
 
-**Version:** 3.0
+**Version:** 3.1
 **Location:** `/docs/architecture.md`
-**Last Updated:** 2026-02-22
+**Last Updated:** 2026-03-15

@@ -71,12 +71,12 @@ market_data_frontend_platform/
 │   │       ├── PriceView.jsx
 │   │       └── PriceView.module.css
 │   │
-│   ├── assets/                     ← Static images, fonts, icons
-│   ├── index.css                   ← CSS variables + global reset (only global CSS)
-│   └── main.jsx                    ← Entry: React root, QueryClient, Router
+│   ├── App.jsx                     ← Root component (Router, QueryClientProvider)
+│   ├── App.module.css              ← Root-level layout styles
+│   └── main.jsx                    ← Entry: React root mount
 │
-├── public/                         ← Static files served as-is (favicon, etc.)
-├── docs/                           ← Planning documents
+├── tests/                          ← Test utilities and setup
+├── docs/                           ← PRD, QA protocol, architecture
 ├── Dockerfile                      ← Multi-stage: builder + production (Nginx) + development
 ├── nginx.conf                      ← SPA fallback: all routes → index.html
 ├── package.json

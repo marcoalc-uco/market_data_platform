@@ -2,18 +2,19 @@
 # Delegates to service-level Makefiles. Requires GNU Make.
 
 .PHONY: up up-dev down down-clean logs logs-api logs-frontend \
-        backend-test backend-test-integration backend-test-all backend-test-cov \
+        backend-dev backend-test backend-test-integration backend-test-all backend-test-cov \
         backend-lint backend-migrate backend-upgrade \
         frontend-install frontend-dev frontend-build frontend-lint frontend-test \
         check-all check-all-integration help
 
 # ── Full Stack ────────────────────────────────────────────────────────────────
-up:           ## Start all services (production-like)
+up:           ## Start all services (production-like) + open logs in new window
 	docker-compose up -d --build
 	docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
-	@echo Services started.
+	@echo Services started. Opening logs window...
+	start cmd /k "docker-compose logs -f"
 
-up-dev:       ## Start all services with hot reload
+up-dev:       ## Start all services with hot reload (logs in same terminal)
 	docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
 
 down:         ## Stop all services
@@ -32,6 +33,9 @@ logs-frontend: ## Follow frontend logs only
 	docker-compose logs -f frontend
 
 # ── Backend ───────────────────────────────────────────────────────────────────
+backend-dev:  ## Start backend dev server locally (uvicorn --reload, no Docker)
+	cd market_data_backend_platform && make dev
+
 backend-test: ## Run backend unit tests
 	cd market_data_backend_platform && make test
 
@@ -45,7 +49,7 @@ backend-test-all: ## Run all backend tests (unit + integration)
 backend-test-cov: ## Run backend tests with coverage report
 	cd market_data_backend_platform && make test-cov
 
-backend-lint: ## Run backend linting (ruff + mypy)
+backend-lint: ## Run backend linting (black, isort, mypy)
 	cd market_data_backend_platform && make lint
 
 backend-migrate: ## Generate new Alembic migration (msg="description")
@@ -58,7 +62,7 @@ backend-upgrade: ## Apply pending Alembic migrations
 frontend-install: ## Install frontend dependencies
 	cd market_data_frontend_platform && npm install
 
-frontend-dev: ## Start frontend dev server (standalone)
+frontend-dev: ## Start frontend dev server (standalone, no Docker)
 	cd market_data_frontend_platform && npm run dev
 
 frontend-build: ## Build frontend for production

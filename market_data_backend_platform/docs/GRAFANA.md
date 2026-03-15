@@ -311,4 +311,4 @@ All three dashboard panels filter on `i.symbol IN ($symbol)`.
 
 **Version**: 2.0
 **Last Updated**: 2026-02-22
-**Related**: [architecture.md](./architecture.md) — [roadmap.md](./roadmap.md)
+**Related**: [architecture.md](./architecture.md) — [QA_PROTOCOL.md](./QA_PROTOCOL.md)
