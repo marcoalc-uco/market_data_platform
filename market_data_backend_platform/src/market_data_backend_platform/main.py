@@ -14,7 +14,13 @@ from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from market_data_backend_platform.api.routes import auth, health, instruments, prices
+from market_data_backend_platform.api.routes import (
+    auth,
+    chat,
+    health,
+    instruments,
+    prices,
+)
 from market_data_backend_platform.auth.dependencies import get_current_user
 from market_data_backend_platform.core import (
     MarketDataError,
@@ -42,6 +48,17 @@ async def lifespan(_app: FastAPI) -> AsyncGenerator[None, None]:
         app_name=settings.app_name,
         version=settings.app_version,
         debug=settings.debug,
+    )
+
+    # Initialize ChromaDB persistent client for RAG vector storage
+    import chromadb
+
+    _app.state.chromadb_client = chromadb.PersistentClient(
+        path=settings.chromadb_persist_directory,
+    )
+    logger.info(
+        "chromadb_initialized",
+        persist_directory=settings.chromadb_persist_directory,
     )
 
     # Start scheduler if enabled
@@ -103,6 +120,13 @@ app.include_router(
     prices.router,
     prefix=f"{settings.api_prefix}/prices",
     tags=["prices"],
+    dependencies=[Depends(get_current_user)],
+)
+# Chat endpoints at /api/v1/chat (protected)
+app.include_router(
+    chat.router,
+    prefix=f"{settings.api_prefix}/chat",
+    tags=["chat"],
     dependencies=[Depends(get_current_user)],
 )
 

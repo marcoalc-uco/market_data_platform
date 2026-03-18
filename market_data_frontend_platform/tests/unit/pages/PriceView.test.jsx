@@ -3,10 +3,14 @@ import { screen, fireEvent } from '@testing-library/react'
 import { renderWithProviders } from '../../../src/test/testUtils.jsx'
 import PriceView from '../../../src/pages/PriceView/PriceView.jsx'
 
-// Mock lightweight-charts — requires a real browser canvas
+// Mock lightweight-charts — requires a real browser canvas.
+// Include all three series types so chartType switching doesn't throw.
+const seriesStub = () => ({ setData: vi.fn() })
 vi.mock('lightweight-charts', () => ({
   createChart: vi.fn(() => ({
-    addCandlestickSeries: vi.fn(() => ({ setData: vi.fn() })),
+    addCandlestickSeries: vi.fn(seriesStub),
+    addLineSeries: vi.fn(seriesStub),
+    addAreaSeries: vi.fn(seriesStub),
     timeScale: vi.fn(() => ({ fitContent: vi.fn() })),
     remove: vi.fn(),
   })),
@@ -26,9 +30,16 @@ vi.mock('react-router-dom', async () => {
 // Mock the data hooks
 vi.mock('../../../src/hooks/usePrices.js', () => ({ usePrices: vi.fn() }))
 vi.mock('../../../src/hooks/useLatestPrice.js', () => ({ useLatestPrice: vi.fn() }))
+vi.mock('../../../src/hooks/useInstrument.js', () => ({ useInstrument: vi.fn() }))
+
+// Mock ChatBox — heavy SSE component not under test here
+vi.mock('../../../src/components/ChatBox/ChatBox.jsx', () => ({
+  default: () => <div data-testid="chatbox-mock" />,
+}))
 
 import { usePrices } from '../../../src/hooks/usePrices.js'
 import { useLatestPrice } from '../../../src/hooks/useLatestPrice.js'
+import { useInstrument } from '../../../src/hooks/useInstrument.js'
 
 const PRICES = [
   {
@@ -51,9 +62,18 @@ const LATEST_PRICE = {
   volume: 4000000,
 }
 
+/** Helper: set up all hooks for a "data loaded" scenario. */
+function setupLoadedState({ assetType = 'stock' } = {}) {
+  usePrices.mockReturnValue({ data: PRICES, isLoading: false, error: null })
+  useLatestPrice.mockReturnValue({ data: LATEST_PRICE, isLoading: false, error: null })
+  useInstrument.mockReturnValue({ data: { name: 'Test Corp', asset_type: assetType } })
+}
+
 describe('PriceView page', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    // Default: instrument not yet loaded
+    useInstrument.mockReturnValue({ data: null })
   })
 
   it('shows a loading state while prices are fetching', () => {
@@ -78,15 +98,13 @@ describe('PriceView page', () => {
   })
 
   it('renders the PriceChart when data is available', () => {
-    usePrices.mockReturnValue({ data: PRICES, isLoading: false, error: null })
-    useLatestPrice.mockReturnValue({ data: LATEST_PRICE, isLoading: false, error: null })
+    setupLoadedState()
     renderWithProviders(<PriceView />)
     expect(screen.getByTestId('chart-container')).toBeInTheDocument()
   })
 
   it('renders the LatestPriceSummary with price values', () => {
-    usePrices.mockReturnValue({ data: PRICES, isLoading: false, error: null })
-    useLatestPrice.mockReturnValue({ data: LATEST_PRICE, isLoading: false, error: null })
+    setupLoadedState()
     renderWithProviders(<PriceView />)
     expect(screen.getByText('108.00')).toBeInTheDocument()
     expect(screen.getByText('4,000,000')).toBeInTheDocument()
@@ -113,5 +131,37 @@ describe('PriceView page', () => {
     renderWithProviders(<PriceView />)
     fireEvent.click(screen.getByText(/back to instruments/i))
     expect(mockNavigate).toHaveBeenCalledWith('/instruments')
+  })
+
+  // ── Chart type selector ────────────────────────────────────────────────
+
+  it('renders the three chart-type buttons when data is available', () => {
+    setupLoadedState()
+    renderWithProviders(<PriceView />)
+    expect(screen.getByRole('button', { name: /candles/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /line/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /mountain/i })).toBeInTheDocument()
+  })
+
+  it('defaults to "candlestick" for stock instruments', () => {
+    setupLoadedState({ assetType: 'stock' })
+    renderWithProviders(<PriceView />)
+    expect(screen.getByRole('button', { name: /candles/i })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: /mountain/i })).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  it('defaults to "area" for index instruments', () => {
+    setupLoadedState({ assetType: 'index' })
+    renderWithProviders(<PriceView />)
+    expect(screen.getByRole('button', { name: /mountain/i })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: /candles/i })).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  it('switches to "line" when the Line button is clicked', () => {
+    setupLoadedState()
+    renderWithProviders(<PriceView />)
+    fireEvent.click(screen.getByRole('button', { name: /line/i }))
+    expect(screen.getByRole('button', { name: /line/i })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: /candles/i })).toHaveAttribute('aria-pressed', 'false')
   })
 })

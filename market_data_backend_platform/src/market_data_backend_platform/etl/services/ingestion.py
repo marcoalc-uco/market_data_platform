@@ -21,6 +21,7 @@ from market_data_backend_platform.etl.clients.yahoo import YahooFinanceClient
 from market_data_backend_platform.etl.transformers.yahoo_transformer import (
     YahooTransformer,
 )
+from market_data_backend_platform.models.instrument import InstrumentType
 from market_data_backend_platform.models.market_price import MarketPrice
 from market_data_backend_platform.repositories.instrument import InstrumentRepository
 from market_data_backend_platform.repositories.market_price import MarketPriceRepository
@@ -142,6 +143,7 @@ class IngestionService:
         self,
         interval: str = "1d",
         period: str = "1mo",
+        instrument_types: list[InstrumentType] | None = None,
     ) -> dict[str, int]:
         """Ingest historical prices for all active instruments.
 
@@ -152,11 +154,18 @@ class IngestionService:
         Args:
             interval: Data interval (1d, 1wk, 1mo).
             period: Time period (1d, 5d, 1mo, 3mo, 6mo, 1y, 5y, max).
+            instrument_types: If provided, only instruments of these types
+                are ingested. Use to separate intraday (STOCK, CRYPTO) from
+                daily-only (INDEX) instruments.
 
         Returns:
             Summary dict with total_instruments, total_inserted, failed.
         """
         active_instruments = self.instrument_repo.get_active()
+        if instrument_types is not None:
+            active_instruments = [
+                i for i in active_instruments if i.instrument_type in instrument_types
+            ]
 
         logger.info(
             "ingestion_batch_start",

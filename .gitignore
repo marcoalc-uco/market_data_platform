@@ -40,6 +40,9 @@ desktop.ini
 *.swo
 *~
 
+# ── Local data (ChromaDB, caches) ────────────────────────────────────────────
+market_data_backend_platform/data/
+
 # ── Docker ───────────────────────────────────────────────────────────────────
 # (volumes and override files are local only)
 docker-compose.override.yml

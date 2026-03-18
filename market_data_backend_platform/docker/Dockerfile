@@ -4,9 +4,11 @@ FROM python:3.14-slim AS builder
 
 WORKDIR /build
 
-# Install system dependencies
+# Install system dependencies (build-essential needed for chromadb native extensions)
 RUN apt-get update && apt-get install -y \
     gcc \
+    g++ \
+    build-essential \
     postgresql-client \
     curl \
     && rm -rf /var/lib/apt/lists/*
@@ -25,10 +27,11 @@ FROM python:3.14-slim
 
 WORKDIR /app
 
-# Install runtime dependencies only
+# Install runtime dependencies only (libgomp1 needed by onnxruntime/chromadb)
 RUN apt-get update && apt-get install -y \
     postgresql-client \
     curl \
+    libgomp1 \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy virtual environment from builder
@@ -43,8 +46,9 @@ COPY alembic.ini /app/alembic.ini
 # Set PYTHONPATH so the application module can be imported
 ENV PYTHONPATH="/app/src:$PYTHONPATH"
 
-# Create non-root user
+# Create non-root user and ChromaDB data directory
 RUN useradd -m -u 1000 appuser && \
+    mkdir -p /app/data/chromadb && \
     chown -R appuser:appuser /app
 USER appuser
 

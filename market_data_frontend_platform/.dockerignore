@@ -1,0 +1,11 @@
+# Exclude local env files — VITE_API_URL must NOT be baked into the Docker build.
+# In Docker, the frontend uses relative URLs (VITE_API_URL='') so Nginx proxies
+# /api/ to the backend container. Including .env would bypass Nginx and cause CORS errors.
+.env
+.env.*
+!.env.example
+
+# Dev artifacts
+node_modules
+dist
+*.log

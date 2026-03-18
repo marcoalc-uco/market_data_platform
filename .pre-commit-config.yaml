@@ -1,5 +1,5 @@
 repos:
-  # --- ISORT (backend Python only) ---
+  # --- ISORT (backend Python: src + tests) ---
   - repo: https://github.com/pycqa/isort
     rev: 7.0.0
     hooks:
@@ -7,16 +7,16 @@ repos:
         name: isort (sort imports)
         language_version: python3.14
         args: ["--profile=black"]
-        files: ^market_data_backend_platform/src/
+        files: ^market_data_backend_platform/(src|tests)/
         stages: [pre-commit]
 
-  # --- BLACK (backend Python only) ---
+  # --- BLACK (backend Python: src + tests) ---
   - repo: https://github.com/psf/black
-    rev: 25.11.0
+    rev: 25.12.0
     hooks:
       - id: black
         language_version: python3.14
-        files: ^market_data_backend_platform/src/
+        files: ^market_data_backend_platform/(src|tests)/
         stages: [pre-commit]
 
   # --- PYLINT (backend Python only) ---
@@ -24,12 +24,13 @@ repos:
     hooks:
       - id: pylint
         name: pylint (local)
-        entry: market_data_backend_platform/.venv/Scripts/pylint.exe
+        entry: pylint
         language: python
         types: [python]
         files: ^market_data_backend_platform/src/
         args:
           - "--rcfile=market_data_backend_platform/.pylintrc"
+          - "--disable=import-error"
         additional_dependencies:
           - pylint==4.0.3
           - pydantic==2.12.4
@@ -63,11 +64,14 @@ repos:
       - id: check-merge-conflict
 
   # --- PYTEST (backend only, pre-push) ---
+  # Unit tests only via the backend .venv (fast, no Docker needed).
+  # Integration tests run exclusively in CI/CD (GitHub Actions)
+  # where Docker services are available in a controlled environment.
   - repo: local
     hooks:
-      - id: pytest-full
-        name: pytest full suite (backend)
-        entry: bash -c "cd market_data_backend_platform && .venv/Scripts/pytest.exe -q"
+      - id: pytest-unit
+        name: pytest unit tests (backend .venv)
+        entry: bash -c "cd market_data_backend_platform && .venv/Scripts/python.exe -m pytest tests/unit/ -q"
         language: system
         types: [python]
         files: ^market_data_backend_platform/
@@ -90,8 +94,8 @@ repos:
   - repo: local
     hooks:
       - id: prettier
-        name: Prettier check (frontend)
-        entry: bash -c "if [ -f market_data_frontend_platform/package.json ]; then cd market_data_frontend_platform && npm run format:check; fi"
+        name: Prettier (frontend)
+        entry: bash -c "if [ -f market_data_frontend_platform/package.json ]; then cd market_data_frontend_platform && npm run format; fi"
         language: system
         files: ^market_data_frontend_platform/src/
         stages: [pre-commit]

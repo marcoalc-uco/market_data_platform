@@ -11,7 +11,7 @@ The endpoint responds with service status and version.
 from fastapi import APIRouter
 from pydantic import BaseModel
 
-from market_data_backend_platform.api import SettingsDep
+from market_data_backend_platform.api.dependencies import SettingsDep
 
 # Create router for health endpoints
 router = APIRouter(tags=["health"])

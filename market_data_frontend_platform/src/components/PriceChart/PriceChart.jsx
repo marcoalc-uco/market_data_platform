@@ -4,20 +4,24 @@ import { createChart } from 'lightweight-charts'
 import styles from './PriceChart.module.css'
 
 /**
- * Candlestick chart for OHLCV price data powered by lightweight-charts.
+ * Price chart for OHLCV data powered by lightweight-charts.
+ *
+ * Chart types:
+ *   - "candlestick" — OHLC candlestick (default, good for stocks)
+ *   - "line"        — Simple close-price line
+ *   - "area"        — Filled area / mountain chart (good for indices / ETFs)
  *
  * @param {Object}   props
- * @param {string}   props.symbol - Instrument symbol label (e.g. "AAPL").
- * @param {Array}    props.data   - Array of { time, open, high, low, close }.
- *                                  `time` must be a UNIX timestamp in seconds (number).
- *                                  OHLC values must be numbers.
+ * @param {string}   props.symbol    - Instrument symbol label (e.g. "AAPL").
+ * @param {Array}    props.data      - Array of { time, open, high, low, close }.
+ * @param {string}   [props.chartType="candlestick"] - "candlestick" | "line" | "area".
  */
-export default function PriceChart({ symbol, data }) {
+export default function PriceChart({ symbol, data, chartType = 'candlestick' }) {
   const containerRef = useRef(null)
   const chartRef = useRef(null)
   const seriesRef = useRef(null)
 
-  // Initialise chart once on mount, destroy on unmount
+  // Initialise chart once on mount (or when chartType changes), destroy on unmount
   useEffect(() => {
     if (!containerRef.current) return
 
@@ -38,25 +42,46 @@ export default function PriceChart({ symbol, data }) {
       },
     })
 
-    seriesRef.current = chartRef.current.addCandlestickSeries({
-      upColor: '#26a69a',
-      downColor: '#ef5350',
-      borderVisible: false,
-      wickUpColor: '#26a69a',
-      wickDownColor: '#ef5350',
-    })
+    if (chartType === 'area') {
+      seriesRef.current = chartRef.current.addAreaSeries({
+        lineColor: '#2962FF',
+        topColor: 'rgba(41, 98, 255, 0.3)',
+        bottomColor: 'rgba(41, 98, 255, 0.02)',
+        lineWidth: 2,
+      })
+    } else if (chartType === 'line') {
+      seriesRef.current = chartRef.current.addLineSeries({
+        color: '#2962FF',
+        lineWidth: 2,
+      })
+    } else {
+      // candlestick (default)
+      seriesRef.current = chartRef.current.addCandlestickSeries({
+        upColor: '#26a69a',
+        downColor: '#ef5350',
+        borderVisible: false,
+        wickUpColor: '#26a69a',
+        wickDownColor: '#ef5350',
+      })
+    }
 
     return () => {
       chartRef.current?.remove()
     }
-  }, [])
+  }, [chartType])
 
   // Update series data whenever `data` prop changes
   useEffect(() => {
     if (!seriesRef.current || !data?.length) return
-    seriesRef.current.setData(data)
+
+    if (chartType === 'candlestick') {
+      seriesRef.current.setData(data)
+    } else {
+      // line and area series expect { time, value }
+      seriesRef.current.setData(data.map((p) => ({ time: p.time, value: p.close })))
+    }
     chartRef.current?.timeScale().fitContent()
-  }, [data])
+  }, [data, chartType])
 
   return (
     <div className={styles.wrapper}>
@@ -77,4 +102,5 @@ PriceChart.propTypes = {
       close: PropTypes.number.isRequired,
     })
   ).isRequired,
+  chartType: PropTypes.oneOf(['candlestick', 'line', 'area']),
 }

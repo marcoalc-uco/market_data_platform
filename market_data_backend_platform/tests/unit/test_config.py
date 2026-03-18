@@ -100,13 +100,22 @@ class TestDatabaseSettings:
         assert isinstance(settings.db_name, str)
 
     def test_settings_has_database_url_property(self) -> None:
-        """Test that settings has get_database_url method."""
-        settings = Settings()
+        """Test that get_database_url builds a URL from individual db_* parts
+        when no full DATABASE_URL is provided (env-agnostic)."""
+        # Pass explicit values so env vars (e.g. DATABASE_URL set in Docker)
+        # do not interfere with the URL-composition logic being tested.
+        settings = Settings(
+            database_url=None,
+            db_host="testhost",
+            db_port=5432,
+            db_user="testuser",
+            db_name="testdb",
+        )
         assert hasattr(settings, "get_database_url")
         url = settings.get_database_url()
         assert url.startswith("postgresql://")
-        assert settings.db_host in url
-        assert settings.db_name in url
+        assert "testhost" in url
+        assert "testdb" in url
 
     def test_settings_has_db_pool_size(self) -> None:
         """Test that settings has db_pool_size attribute."""

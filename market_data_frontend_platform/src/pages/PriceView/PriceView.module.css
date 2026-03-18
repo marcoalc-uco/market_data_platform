@@ -56,3 +56,41 @@
   font-style: italic;
   padding: 1rem 0;
 }
+
+/* ── Chart type selector ────────────────────────────────── */
+.chartTypeSelector {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.chartTypeBtn {
+  padding: 0.35rem 0.9rem;
+  border: 1px solid #d1d5db;
+  border-radius: 20px;
+  background: #fff;
+  color: #374151;
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition:
+    background 0.15s,
+    border-color 0.15s,
+    color 0.15s;
+  white-space: nowrap;
+}
+
+.chartTypeBtn:hover {
+  background: #f3f4f6;
+  border-color: #9ca3af;
+}
+
+.chartTypeBtnActive {
+  background: #1a1a2e;
+  border-color: #1a1a2e;
+  color: #ffffff;
+}
+
+.chartTypeBtnActive:hover {
+  background: #2d2d4e;
+  border-color: #2d2d4e;
+}

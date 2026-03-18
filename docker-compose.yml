@@ -29,10 +29,11 @@ services:
       dockerfile: docker/Dockerfile
     container_name: market_data_api
     restart: always
-    # NOTE: ADMIN_PASSWORD_HASH is passed via Docker Secrets (mounted at
-    # /run/secrets/admin_password_hash) — pydantic-settings reads it automatically
-    # via secrets_dir="/run/secrets". This avoids '$' interpolation issues and
-    # prevents the hash from appearing in docker inspect.
+    # Secrets are mounted at /run/secrets/<name> — pydantic-settings reads them
+    # automatically via secrets_dir="/run/secrets".
+    # - admin_password_hash: bcrypt hash contains '$' which docker-compose would
+    #   interpolate incorrectly if passed as env var.
+    # - secret_key: JWT signing key — never exposed in env vars or docker inspect.
     environment:
       DATABASE_URL: postgresql://${POSTGRES_USER:-market_data}:${POSTGRES_PASSWORD:-market_data_pass}@postgres:5432/${POSTGRES_DB:-market_data}
       API_PREFIX: /api/v1
@@ -41,13 +42,30 @@ services:
       INGESTION_INTERVAL_MINUTES: ${INGESTION_INTERVAL_MINUTES:-5}
       ACCESS_TOKEN_EXPIRE_MINUTES: ${ACCESS_TOKEN_EXPIRE_MINUTES:-30}
       ADMIN_EMAIL: ${ADMIN_EMAIL:-admin@market.com}
+      # http://localhost = frontend served by Nginx on port 80 (Docker)
+      # http://localhost:5173 = frontend dev server (make frontend-dev)
+      CORS_ORIGINS: '["http://localhost", "http://localhost:5173"]'
+      # Ollama LLM (points to the ollama container)
+      OLLAMA_BASE_URL: http://ollama:11434
+      OLLAMA_CHAT_MODEL: ${OLLAMA_CHAT_MODEL:-qwen2.5-coder:3b}
+      OLLAMA_EMBEDDING_MODEL: ${OLLAMA_EMBEDDING_MODEL:-nomic-embed-text}
+      # ChromaDB persistence inside the container (mounted volume)
+      CHROMADB_PERSIST_DIRECTORY: /app/data/chromadb
+      # Chat / RAG context limits (keep prompt under context window)
+      CHAT_MAX_PRICE_ROWS: "30"
+      CHAT_MAX_DOC_CHUNKS: "3"
     secrets:
       - admin_password_hash
+      - secret_key
     ports:
       - "8000:8000"
     depends_on:
       postgres:
         condition: service_healthy
+      # Wait for models to be pulled before starting — avoids race condition
+      # where the API tries to embed/chat before models are available.
+      ollama-init:
+        condition: service_completed_successfully
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
       interval: 30s
@@ -57,6 +75,7 @@ services:
     volumes:
       - ./market_data_backend_platform/alembic:/app/alembic
       - ./market_data_backend_platform/alembic.ini:/app/alembic.ini
+      - chromadb_data:/app/data/chromadb
     networks:
       - platform
 
@@ -73,6 +92,52 @@ services:
     depends_on:
       api:
         condition: service_healthy
+    networks:
+      - platform
+
+  ollama:
+    image: ollama/ollama:latest
+    container_name: market_data_ollama
+    restart: always
+    environment:
+      OLLAMA_CONTEXT_LENGTH: "8192"
+    # Port NOT exposed to host — only accessible within Docker network.
+    # The api container reaches it via http://ollama:11434.
+    # If you need local access, stop your local Ollama first and uncomment:
+    # ports:
+    #   - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    healthcheck:
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 10s
+    networks:
+      - platform
+
+  ollama-init:
+    # Reuse the same image already pulled — no extra image needed.
+    # Uses `ollama pull` directly which exits non-zero on failure,
+    # so service_completed_successfully in dependents catches pull errors.
+    image: ollama/ollama:latest
+    container_name: market_data_ollama_init
+    depends_on:
+      ollama:
+        condition: service_healthy
+    restart: "no"
+    environment:
+      OLLAMA_HOST: http://ollama:11434
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        echo "Pulling chat model: ${OLLAMA_CHAT_MODEL:-qwen2.5-coder:3b}..."
+        ollama pull "${OLLAMA_CHAT_MODEL:-qwen2.5-coder:3b}"
+        echo "Pulling embedding model: ${OLLAMA_EMBEDDING_MODEL:-nomic-embed-text}..."
+        ollama pull "${OLLAMA_EMBEDDING_MODEL:-nomic-embed-text}"
+        echo "Models ready."
     networks:
       - platform
 
@@ -103,6 +168,10 @@ volumes:
     driver: local
   grafana_data:
     driver: local
+  ollama_data:
+    driver: local
+  chromadb_data:
+    driver: local
 
 networks:
   platform:
@@ -111,3 +180,5 @@ networks:
 secrets:
   admin_password_hash:
     file: ./secrets/admin_password_hash.txt
+  secret_key:
+    file: ./secrets/secret_key.txt
