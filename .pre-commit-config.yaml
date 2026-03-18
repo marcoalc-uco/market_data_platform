@@ -1,5 +1,5 @@
 repos:
-  # --- ISORT (backend Python only) ---
+  # --- ISORT (backend Python: src + tests) ---
   - repo: https://github.com/pycqa/isort
     rev: 7.0.0
     hooks:
@@ -7,16 +7,16 @@ repos:
         name: isort (sort imports)
         language_version: python3.14
         args: ["--profile=black"]
-        files: ^market_data_backend_platform/src/
+        files: ^market_data_backend_platform/(src|tests)/
         stages: [pre-commit]
 
-  # --- BLACK (backend Python only) ---
+  # --- BLACK (backend Python: src + tests) ---
   - repo: https://github.com/psf/black
-    rev: 25.11.0
+    rev: 25.12.0
     hooks:
       - id: black
         language_version: python3.14
-        files: ^market_data_backend_platform/src/
+        files: ^market_data_backend_platform/(src|tests)/
         stages: [pre-commit]
 
   # --- PYLINT (backend Python only) ---
@@ -63,15 +63,15 @@ repos:
       - id: check-added-large-files
       - id: check-merge-conflict
 
-  # --- PYTEST unit tests (backend only, pre-push) ---
-  # Runs ONLY unit tests inside the Docker test container (Docker-first workflow).
-  # Integration tests require docker-compose.test.yml to be started manually:
-  #   docker compose -f market_data_backend_platform/docker-compose.test.yml up --build
+  # --- PYTEST (backend only, pre-push) ---
+  # Unit tests only via the backend .venv (fast, no Docker needed).
+  # Integration tests run exclusively in CI/CD (GitHub Actions)
+  # where Docker services are available in a controlled environment.
   - repo: local
     hooks:
       - id: pytest-unit
-        name: pytest unit tests (Docker)
-        entry: bash -c "cd market_data_backend_platform && docker compose -f docker-compose.test.yml run --no-deps --rm api_test python -m pytest tests/unit/ -q --no-cov"
+        name: pytest unit tests (backend .venv)
+        entry: bash -c "cd market_data_backend_platform && .venv/Scripts/python.exe -m pytest tests/unit/ -q"
         language: system
         types: [python]
         files: ^market_data_backend_platform/

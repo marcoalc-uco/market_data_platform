@@ -17,7 +17,6 @@ import pytest
 from market_data_backend_platform.chat.clients.ollama import OllamaClient
 from market_data_backend_platform.core import ExternalAPIError
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
@@ -64,7 +63,9 @@ class TestChatStream:
 
         with patch("httpx.AsyncClient", return_value=mock_client_ctx):
             tokens = []
-            async for token in client.chat_stream("test-model", [{"role": "user", "content": "Hi"}]):
+            async for token in client.chat_stream(
+                "test-model", [{"role": "user", "content": "Hi"}]
+            ):
                 tokens.append(token)
 
         assert tokens == ["Hello", " world", "!"]
@@ -313,7 +314,9 @@ class TestEmbed:
         mock_client_ctx.__aexit__ = AsyncMock(return_value=False)
 
         with patch("httpx.AsyncClient", return_value=mock_client_ctx):
-            with pytest.raises(ExternalAPIError, match="Cannot connect to Ollama for embeddings"):
+            with pytest.raises(
+                ExternalAPIError, match="Cannot connect to Ollama for embeddings"
+            ):
                 await client.embed("m", "text")
 
     @pytest.mark.asyncio

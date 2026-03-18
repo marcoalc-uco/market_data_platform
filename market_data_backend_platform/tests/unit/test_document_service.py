@@ -14,7 +14,6 @@ All external dependencies (Ollama, ChromaDB) are mocked.
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
-
 from chromadb.errors import NotFoundError as ChromaNotFoundError
 
 from market_data_backend_platform.chat.services.document_service import (
@@ -23,7 +22,6 @@ from market_data_backend_platform.chat.services.document_service import (
     _chunk_text,
     _extract_text,
 )
-
 
 # ---------------------------------------------------------------------------
 # Fixtures
@@ -193,7 +191,9 @@ class TestIngestDocument:
     """Tests for DocumentService.ingest_document()."""
 
     @pytest.mark.asyncio
-    async def test_ingests_txt_and_returns_chunk_count(self, service, mock_chromadb, mock_ollama):
+    async def test_ingests_txt_and_returns_chunk_count(
+        self, service, mock_chromadb, mock_ollama
+    ):
         """Should parse, chunk, embed, and store a text file."""
         mock_collection = MagicMock()
         mock_chromadb.get_or_create_collection.return_value = mock_collection
@@ -207,7 +207,9 @@ class TestIngestDocument:
         assert mock_ollama.embed.await_count == result
 
     @pytest.mark.asyncio
-    async def test_stores_with_correct_metadata(self, service, mock_chromadb, mock_ollama):
+    async def test_stores_with_correct_metadata(
+        self, service, mock_chromadb, mock_ollama
+    ):
         """Each chunk should be stored with filename and chunk_index metadata."""
         mock_collection = MagicMock()
         mock_chromadb.get_or_create_collection.return_value = mock_collection
@@ -230,7 +232,9 @@ class TestIngestDocument:
         assert kwargs_from_call["metadatas"][0]["chunk_index"] == 0
 
     @pytest.mark.asyncio
-    async def test_uses_correct_collection_name(self, service, mock_chromadb, mock_ollama):
+    async def test_uses_correct_collection_name(
+        self, service, mock_chromadb, mock_ollama
+    ):
         """Collection name should follow instrument_{id}_docs pattern."""
         mock_collection = MagicMock()
         mock_chromadb.get_or_create_collection.return_value = mock_collection
@@ -242,7 +246,9 @@ class TestIngestDocument:
         )
 
     @pytest.mark.asyncio
-    async def test_generates_embeddings_with_correct_model(self, service, mock_chromadb, mock_ollama):
+    async def test_generates_embeddings_with_correct_model(
+        self, service, mock_chromadb, mock_ollama
+    ):
         """Should use the configured embedding model for all chunks."""
         mock_chromadb.get_or_create_collection.return_value = MagicMock()
 
@@ -279,7 +285,9 @@ class TestQueryRelevantChunks:
     """Tests for DocumentService.query_relevant_chunks()."""
 
     @pytest.mark.asyncio
-    async def test_returns_relevant_documents(self, service, mock_chromadb, mock_ollama):
+    async def test_returns_relevant_documents(
+        self, service, mock_chromadb, mock_ollama
+    ):
         """Should return documents from ChromaDB query."""
         mock_collection = MagicMock()
         mock_collection.count.return_value = 10
@@ -294,7 +302,9 @@ class TestQueryRelevantChunks:
         assert result == ["Revenue was $100M", "Q4 increased"]
 
     @pytest.mark.asyncio
-    async def test_returns_empty_when_no_collection_value_error(self, service, mock_chromadb):
+    async def test_returns_empty_when_no_collection_value_error(
+        self, service, mock_chromadb
+    ):
         """Should return empty list if collection raises ValueError."""
         mock_chromadb.get_collection.side_effect = ValueError("Collection not found")
 
@@ -302,7 +312,9 @@ class TestQueryRelevantChunks:
         assert result == []
 
     @pytest.mark.asyncio
-    async def test_returns_empty_when_no_collection_chroma_error(self, service, mock_chromadb):
+    async def test_returns_empty_when_no_collection_chroma_error(
+        self, service, mock_chromadb
+    ):
         """Should return empty list if collection raises ChromaDB NotFoundError."""
         mock_chromadb.get_collection.side_effect = ChromaNotFoundError(
             "Collection [instrument_1_docs] does not exist"
@@ -329,7 +341,9 @@ class TestQueryRelevantChunks:
         )
 
     @pytest.mark.asyncio
-    async def test_limits_results_to_collection_count(self, service, mock_chromadb, mock_ollama):
+    async def test_limits_results_to_collection_count(
+        self, service, mock_chromadb, mock_ollama
+    ):
         """Should request min(top_k, collection.count()) results."""
         mock_collection = MagicMock()
         mock_collection.count.return_value = 2  # Only 2 docs
@@ -345,7 +359,9 @@ class TestQueryRelevantChunks:
         )
 
     @pytest.mark.asyncio
-    async def test_uses_correct_collection_name(self, service, mock_chromadb, mock_ollama):
+    async def test_uses_correct_collection_name(
+        self, service, mock_chromadb, mock_ollama
+    ):
         """Should look up the instrument-specific collection."""
         mock_collection = MagicMock()
         mock_collection.count.return_value = 1
@@ -373,7 +389,9 @@ class TestListDocuments:
         result = service.list_documents(1)
         assert result == []
 
-    def test_returns_empty_when_no_collection_chroma_error(self, service, mock_chromadb):
+    def test_returns_empty_when_no_collection_chroma_error(
+        self, service, mock_chromadb
+    ):
         """Should return empty list when collection raises ChromaDB NotFoundError."""
         mock_chromadb.get_collection.side_effect = ChromaNotFoundError(
             "Collection [instrument_1_docs] does not exist"

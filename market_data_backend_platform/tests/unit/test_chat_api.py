@@ -29,7 +29,6 @@ from market_data_backend_platform.chat.services.document_service import Document
 from market_data_backend_platform.main import app
 from market_data_backend_platform.models import Base
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------

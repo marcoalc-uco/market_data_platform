@@ -22,7 +22,6 @@ from market_data_backend_platform.chat.services.chat_service import (
 )
 from market_data_backend_platform.core import NotFoundError
 
-
 # ---------------------------------------------------------------------------
 # Fixtures
 # ---------------------------------------------------------------------------
@@ -56,7 +55,9 @@ def fixture_mock_doc_service():
 
 
 @pytest.fixture(name="service")
-def fixture_service(mock_ollama, mock_price_repo, mock_instrument_repo, mock_doc_service):
+def fixture_service(
+    mock_ollama, mock_price_repo, mock_instrument_repo, mock_doc_service
+):
     """Create a ChatService with all mocked dependencies."""
     return ChatService(
         ollama_client=mock_ollama,
@@ -104,7 +105,9 @@ class TestFormatPriceTable:
 
     def test_formats_single_row(self):
         """Should format a single OHLCV row as a table line."""
-        prices = [_make_price("2025-01-15 10:00:00", 150.0, 155.0, 149.0, 153.0, 1000000)]
+        prices = [
+            _make_price("2025-01-15 10:00:00", 150.0, 155.0, 149.0, 153.0, 1000000)
+        ]
         result = _format_price_table(prices)
 
         assert "Date" in result
@@ -194,7 +197,12 @@ class TestChatServiceStream:
 
     @pytest.mark.asyncio
     async def test_queries_document_chunks(
-        self, service, mock_instrument_repo, mock_price_repo, mock_doc_service, mock_ollama
+        self,
+        service,
+        mock_instrument_repo,
+        mock_price_repo,
+        mock_doc_service,
+        mock_ollama,
     ):
         """Should query relevant document chunks via DocumentService."""
         mock_instrument_repo.get_by_id.return_value = _make_instrument()
@@ -217,7 +225,9 @@ class TestChatServiceStream:
         self, service, mock_instrument_repo, mock_price_repo, mock_ollama
     ):
         """System prompt should include instrument name and symbol."""
-        mock_instrument_repo.get_by_id.return_value = _make_instrument("Apple Inc.", "AAPL")
+        mock_instrument_repo.get_by_id.return_value = _make_instrument(
+            "Apple Inc.", "AAPL"
+        )
         mock_price_repo.get_by_instrument.return_value = []
 
         captured_messages = []
@@ -263,7 +273,12 @@ class TestChatServiceStream:
 
     @pytest.mark.asyncio
     async def test_system_prompt_contains_doc_chunks(
-        self, service, mock_instrument_repo, mock_price_repo, mock_doc_service, mock_ollama
+        self,
+        service,
+        mock_instrument_repo,
+        mock_price_repo,
+        mock_doc_service,
+        mock_ollama,
     ):
         """System prompt should include relevant document chunks."""
         mock_instrument_repo.get_by_id.return_value = _make_instrument()
@@ -291,7 +306,12 @@ class TestChatServiceStream:
 
     @pytest.mark.asyncio
     async def test_no_docs_shows_placeholder(
-        self, service, mock_instrument_repo, mock_price_repo, mock_doc_service, mock_ollama
+        self,
+        service,
+        mock_instrument_repo,
+        mock_price_repo,
+        mock_doc_service,
+        mock_ollama,
     ):
         """System prompt should show placeholder when no documents exist."""
         mock_instrument_repo.get_by_id.return_value = _make_instrument()
