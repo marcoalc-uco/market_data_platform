@@ -24,12 +24,13 @@ repos:
     hooks:
       - id: pylint
         name: pylint (local)
-        entry: market_data_backend_platform/.venv/Scripts/pylint.exe
+        entry: pylint
         language: python
         types: [python]
         files: ^market_data_backend_platform/src/
         args:
           - "--rcfile=market_data_backend_platform/.pylintrc"
+          - "--disable=import-error"
         additional_dependencies:
           - pylint==4.0.3
           - pydantic==2.12.4
@@ -67,7 +68,7 @@ repos:
     hooks:
       - id: pytest-full
         name: pytest full suite (backend)
-        entry: bash -c "cd market_data_backend_platform && .venv/Scripts/pytest.exe -q"
+        entry: bash -c "cd market_data_backend_platform && python -m pytest -q"
         language: system
         types: [python]
         files: ^market_data_backend_platform/

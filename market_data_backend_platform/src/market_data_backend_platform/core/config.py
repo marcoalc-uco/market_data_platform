@@ -7,7 +7,7 @@ Settings are loaded from environment variables and .env files.
 from functools import lru_cache
 from typing import Literal
 
-from pydantic import Field, computed_field
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -96,7 +96,10 @@ class Settings(BaseSettings):
     # Auth - JWT
     secret_key: str = Field(
         repr=False,
-        description="Secret key for signing JWT tokens. Loaded from Docker secret /run/secrets/secret_key.",
+        description=(
+            "Secret key for signing JWT tokens. "
+            "Loaded from Docker secret /run/secrets/secret_key."
+        ),
     )
     access_token_expire_minutes: int = Field(
         default=30,
@@ -110,7 +113,42 @@ class Settings(BaseSettings):
     admin_password_hash: str = Field(
         default="",
         repr=False,
-        description="Bcrypt hash of admin password. Loaded from Docker secret /run/secrets/admin_password_hash.",
+        description=(
+            "Bcrypt hash of admin password. "
+            "Loaded from Docker secret /run/secrets/admin_password_hash."
+        ),
+    )
+
+    # Ollama (local LLM)
+    ollama_base_url: str = Field(
+        default="http://localhost:11434",
+        description="Base URL for the local Ollama API",
+    )
+    ollama_chat_model: str = Field(
+        default="qwen2.5-coder:3b",
+        description="Ollama model name for chat completions",
+    )
+    ollama_embedding_model: str = Field(
+        default="nomic-embed-text",
+        description="Ollama model name for text embeddings",
+    )
+
+    # ChromaDB (vector store for RAG)
+    chromadb_persist_directory: str = Field(
+        default="./data/chromadb",
+        description="Directory for ChromaDB persistent storage",
+    )
+
+    # Chat / RAG
+    chat_max_price_rows: int = Field(
+        default=60,
+        ge=1,
+        description="Maximum OHLCV rows to include as context in chat prompt",
+    )
+    chat_max_doc_chunks: int = Field(
+        default=5,
+        ge=1,
+        description="Maximum document chunks to retrieve from vector store",
     )
 
     # CORS
@@ -137,7 +175,9 @@ class Settings(BaseSettings):
     # Database URL (optional - if set, overrides computed URL)
     database_url: str | None = Field(
         default=None,
-        description="Full PostgreSQL connection URL (overrides individual fields if set)",
+        description=(
+            "Full PostgreSQL connection URL " "(overrides individual fields if set)"
+        ),
     )
 
     def get_database_url(self) -> str:
