@@ -5,16 +5,22 @@
 
 ![Market Data Platform](docs/instrument.png)
 
-Full-stack platform for ingesting, storing, and visualizing financial market data (stocks, indices, crypto). Built with **FastAPI**, **React**, **PostgreSQL**, and **Grafana**.
+Full-stack platform for ingesting, storing, and visualizing financial market data (stocks, indices, crypto). Built with **FastAPI**, **React**, **PostgreSQL**, **Grafana**, and a local **Ollama LLM** with RAG.
 
 ```
 Browser (:5173 dev / :80 prod)
     |
     v
-  Frontend --- React 18 + Vite + TanStack Query + lightweight-charts
+  Frontend --- React 18 + Vite + TanStack Query + ApexCharts
     |
     v  HTTP :8000
   Backend ---- FastAPI + SQLAlchemy + Alembic + APScheduler
+    |      |
+    |      v  :11434 (internal)
+    |    Ollama ---- local LLM (qwen2.5-coder:3b)
+    |      |
+    |      v
+    |    ChromaDB -- vector store (RAG document chunks)
     |
     v  :5432
   PostgreSQL - TimescaleDB-ready schema
@@ -27,12 +33,13 @@ Browser (:5173 dev / :80 prod)
 
 ## ✨ Features
 
-- **ETL pipeline** -- Automated ingestion from Yahoo Finance (OHLCV data) via APScheduler
+- **ETL pipeline** -- Automated ingestion from Yahoo Finance (OHLCV data) via APScheduler; daily run at 16:30 UTC, intraday every 5 min; indices handled gracefully (no intraday data)
 - **REST API** -- Full CRUD on instruments + price queries with pagination, OpenAPI docs at `/docs`
 - **JWT authentication** -- Secure login with bcrypt-hashed passwords and HS256 tokens
-- **React dashboard** -- Instruments table with filters/CRUD, candlestick price chart, date range picker
+- **React dashboard** -- Instruments table with filters/CRUD, price charts (candlestick / line / mountain), date range picker
+- **RAG chat assistant** -- Per-instrument chat powered by a local Ollama LLM (zero cost, no external API); upload PDFs/docs to augment context via ChromaDB vector search; streamed responses via SSE
 - **Grafana dashboards** -- Multi-instrument candlestick + volume charts with cross-filtering by asset type
-- **Docker orchestration** -- One command to start everything (prod + dev hot-reload modes)
+- **Docker orchestration** -- One command to start everything (prod + dev hot-reload modes); Ollama models pulled automatically on first start via init container
 
 ---
 
@@ -104,9 +111,16 @@ make up-dev
 ### View price charts
 
 1. Click any instrument row to open its price chart
-2. The candlestick chart shows OHLCV data powered by lightweight-charts
+2. Switch chart type with the toolbar: **Candlestick**, **Line**, or **Mountain** (area with gradient fill)
 3. Use the date range picker to zoom into a specific period
 4. The latest price summary card shows the most recent OHLCV snapshot
+
+### Chat with the AI assistant (RAG)
+
+1. Open any instrument price page — the chat panel appears below the chart
+2. Ask questions about the instrument: price trends, volatility, context
+3. Optionally upload a PDF, Markdown, or text document (e.g. a fund factsheet or earnings report) to enrich the assistant's context
+4. The local Ollama model (no API key required, zero cost) streams a response using both the recent OHLCV data and the uploaded document chunks retrieved via semantic search
 
 ### Monitor via Grafana
 
@@ -186,6 +200,8 @@ Run `make help` to see all commands. Key ones:
 | Auth       | JWT (PyJWT) + bcrypt |
 | Scheduler  | APScheduler          |
 | Database   | PostgreSQL 16        |
+| LLM        | Ollama (local)       |
+| Vector DB  | ChromaDB             |
 | Logging    | structlog (JSON)     |
 | Testing    | pytest + httpx       |
 | Quality    | black + isort + mypy |
@@ -198,12 +214,12 @@ Run `make help` to see all commands. Key ones:
 | Framework    | React 18                   |
 | Build        | Vite 5                     |
 | Server state | TanStack Query v5          |
-| Charts       | lightweight-charts 4       |
+| Charts       | ApexCharts (candlestick / line / mountain) |
 | Routing      | react-router-dom v6        |
 | Styling      | CSS Modules                |
 | Testing      | Vitest + React Testing Lib |
 | Quality      | ESLint 8 + Prettier        |
-| Production   | Nginx (Alpine)             |
+| Production   | Nginx (Alpine) + SSE proxy |
 
 ---
 
@@ -223,6 +239,9 @@ Full OpenAPI documentation available at `http://localhost:8000/docs` when the ba
 | GET    | `/api/v1/prices/{instrument_id}`        | Yes  | Get OHLCV prices     |
 | GET    | `/api/v1/prices/{instrument_id}/latest` | Yes  | Get latest price     |
 | POST   | `/api/v1/ingest/run`                    | Yes  | Trigger ETL manually |
+| POST   | `/api/v1/chat/{instrument_id}`          | Yes  | Stream chat response (SSE) |
+| POST   | `/api/v1/chat/{instrument_id}/documents`| Yes  | Upload document for RAG    |
+| GET    | `/api/v1/chat/{instrument_id}/documents`| Yes  | List uploaded documents    |
 
 ---
 
