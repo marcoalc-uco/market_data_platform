@@ -100,7 +100,7 @@ def start_scheduler(interval_minutes: int | None = None) -> None:
     """Start the background scheduler with two jobs:
 
     - Intraday job: fetches 5m candles for STOCK/CRYPTO every N minutes.
-    - Daily job: fetches 1d candles for INDEX instruments once per day at 18:30.
+    - Daily job: fetches 1d candles for INDEX instruments once per day at 16:30.
 
     Args:
         interval_minutes: Minutes between intraday runs.
@@ -126,10 +126,10 @@ def start_scheduler(interval_minutes: int | None = None) -> None:
     )
 
     # Daily job — INDEX instruments (no intraday data available on Yahoo Finance)
-    # Runs at 17:30 Europe/Madrid (handles DST automatically: UTC+1 winter, UTC+2 summer)
+    # Runs at 16:30 Europe/Madrid (handles DST automatically: UTC+1 winter, UTC+2 summer)
     _scheduler.add_job(
         run_daily_job,
-        trigger=CronTrigger(hour=23, minute=30, timezone="Europe/Madrid"),
+        trigger=CronTrigger(hour=17, minute=00, timezone="Europe/Madrid"),
         id="daily_ingestion_job",
         name="Daily Market Data Ingestion (INDEX)",
         replace_existing=True,
@@ -144,7 +144,7 @@ def start_scheduler(interval_minutes: int | None = None) -> None:
 
     logger.info(
         "scheduler_started",
-        daily_job_time="17:30 Europe/Madrid",
+        daily_job_time="17:00 Europe/Madrid",
     )
 
 
