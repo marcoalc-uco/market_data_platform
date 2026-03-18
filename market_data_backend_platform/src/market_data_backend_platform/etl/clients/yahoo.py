@@ -196,9 +196,11 @@ class YahooFinanceClient:
                 if open_val == 0 and close_val == 0:
                     continue
 
-                # Skip completely flat candles with 0 volume (often live incomplete ticks or illiquid periods)
+                # Skip flat 0-volume candles for intraday only (incomplete ticks)
+                # For daily intervals, volume=0 with equal OHLC is valid (e.g. mutual fund NAV)
                 if (
-                    vol_val == 0
+                    interval != "1d"
+                    and vol_val == 0
                     and open_val == close_val
                     and high_val == low_val
                     and open_val == high_val
