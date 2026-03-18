@@ -55,6 +55,8 @@ services:
     volumes:
       - ./alembic:/app/alembic
       - ./alembic.ini:/app/alembic.ini
+      - ./tests:/app/tests
+      - ./pyproject.toml:/app/pyproject.toml
 
 volumes:
   postgres_test_data:

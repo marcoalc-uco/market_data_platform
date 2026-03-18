@@ -16,6 +16,11 @@ services:
       - ./market_data_backend_platform/alembic:/app/alembic
       - ./market_data_backend_platform/alembic.ini:/app/alembic.ini
 
+  ollama:
+    # In dev, expose port and mount local volume for faster model management
+    volumes:
+      - ollama_data:/root/.ollama
+
   frontend:
     build:
       context: ./market_data_frontend_platform
